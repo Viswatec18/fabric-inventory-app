@@ -107,7 +107,7 @@ export const getFabrics = async (filters = {}) => {
           minimum_order_quantity: 50,
           gsm: 180,
           rating: 4.8,
-          review_count\: 124,
+          review_count: 124,
           status: 'active',
           stock_quantity: 500,
           is_featured: true,
