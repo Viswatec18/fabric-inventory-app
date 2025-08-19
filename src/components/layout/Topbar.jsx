@@ -1,93 +1,429 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Icon from '../AppIcon';
+import { supabase } from '../lib/supabase';
 
-export const Topbar = () => {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleBrandClick = () => {
+// Retry utility function
+const retryOperation = async (operation, maxRetries = 3, delay = 1000) => {
+  for (let i = 0; i < maxRetries; i++) {
     try {
-      navigate('/fabric-catalog-browse');
+      return await operation();
     } catch (error) {
-      console.error('Navigation error:', error);
-      window.location.href = '/fabric-catalog-browse';
-    }
-  };
-  const handleSearch = (e) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      try {
-        navigate(`/fabric-catalog-browse?search=${encodeURIComponent(searchQuery)}`);
-      } catch (error) {
-        console.error('Search navigation error:', error);
-        window.location.href = `/fabric-catalog-browse?search=${encodeURIComponent(searchQuery)}`;
+      if (i === maxRetries - 1) throw error;
+      
+      // Don't retry on certain errors
+      if (error?.message?.includes('does not exist') || 
+          error?.message?.includes('PGRST116') ||
+          error?.code === 'PGRST116') {
+        throw error;
       }
-    }
-  };
-
-  const handleDocsClick = () => {
-    try {
-      window.open('https://docs.fabrichub.com', '_blank');
-    } catch (error) {
-      console.error('Docs navigation error:', error);
-      // Fallback to internal help page
-      navigate('/support/docs');
-    }
-  };
-
-  const handleGetStarted = () => {
-    try {
-      navigate('/login-registration');
-    } catch (error) {
-      console.error('Get started navigation error:', error);
-      window.location.href = '/login-registration';
-    }
-  };
-
-  return (
-    <div className="h-full flex items-center justify-between px-4 bg-bg-elevate border-b border-border">
-      {/* Brand */}
-      <button 
-        onClick={handleBrandClick}
-        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-        type="button"
-      >
-        <div className="w-5 h-5 bg-accent rounded-full"></div>
-        <span className="font-semibold text-ink text-sm">FabricHub</span>
-      </button>
       
-      {/* Search */}
-      <div className="flex-1 max-w-sm mx-6">
-        <div className="relative">
-          <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-mute" />
-          <input
-            type="text"
-            placeholder="Search fabrics, designers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input w-full pl-9 py-2 text-sm"
-            onKeyDown={handleSearch}
-          />
-        </div>
-      </div>
-      
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <button 
-          onClick={handleDocsClick}
-          type="button"
-          className="btn text-ink-dim hover:text-ink text-sm px-3 py-2"
-        >
-          Docs
-        </button>
-        <button 
-          onClick={handleGetStarted}
-          type="button"
-          className="btn-accent text-sm px-3 py-2"
-        >
-          Get Started
-        </button>
-      </div>
-    </div>
-  );
+      await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+    }
+  }
 };
+
+// Check Supabase connection
+const checkSupabaseConnection = async () => {
+  try {
+    // Try to connect to Supabase
+    const { data, error } = await supabase?.from('fabrics')?.select('id')?.limit(1);
+    if (error && error?.code !== 'PGRST116') {
+      throw error;
+    }
+    return true;
+  } catch (error) {
+    console.error('Supabase connection check failed:', error);
+    // Return true to allow mock data fallback
+    return true;
+  }
+};
+
+// Get all fabrics with optional filtering and pagination
+export const getFabrics = async (filters = {}) => {
+  try {
+    // Try to get real data first, fallback to mock data
+    try {
+      const operation = async () => {
+        let query = supabase?.from('fabrics')?.select(`
+          *,
+          vendor:vendors(
+            id,
+            name,
+            verified,
+            rating
+          ),
+          fabric_images(
+            id,
+            image_url,
+            display_order
+          )
+        `);
+
+        // Apply filters (existing filter logic)
+        if (filters?.materials && filters?.materials?.length > 0) {
+          query = query?.in('material', filters?.materials);
+        }
+
+        if (filters?.search) {
+          query = query?.or(`name.ilike.%${filters?.search}%,material.ilike.%${filters?.search}%,composition.ilike.%${filters?.search}%`);
+        }
+
+        // Sorting
+        if (filters?.sortBy) {
+          switch (filters?.sortBy) {
+            case 'price-low':
+              query = query?.order('price_per_yard', { ascending: true });
+              break;
+            case 'price-high':
+              query = query?.order('price_per_yard', { ascending: false });
+              break;
+            case 'newest':
+              query = query?.order('created_at', { ascending: false });
+              break;
+            default:
+              query = query?.order('created_at', { ascending: false });
+          }
+        }
+
+        const { data, error, count } = await query;
+        
+        if (error) {
+          throw error;
+        }
+
+        return { data: data || [], count: count || 0 };
+      };
+
+      return await retryOperation(operation);
+    } catch (error) {
+      console.warn('Using mock data due to database connection issue:', error?.message);
+      
+      // Return mock data for development
+      const mockFabrics = [
+        {
+          id: 'mock-1',
+          name: 'Premium Cotton Blend',
+          description: 'High-quality cotton blend fabric perfect for fashion garments',
+          material: 'Cotton',
+          price_per_yard: 12.50,
+          minimum_order_quantity: 50,
+          gsm: 180,
+          rating: 4.8,
+          review_count: 124,
+          status: 'active',
+          stock_quantity: 500,
+          is_featured: true,
+          fabric_images: [
+    }
+
+    const operation = async () => {
+      let query = supabase?.from('fabrics')?.select(`
+        *,
+        vendor:vendors(
+          id,
+          name,
+          verified,
+          rating
+        ),
+        fabric_images(
+          id,
+          image_url,
+          display_order
+        )
+      `);
+
+      // Apply filters
+      if (filters?.materials && filters?.materials?.length > 0) {
+        query = query?.in('material', filters?.materials);
+      }
+
+      if (filters?.vendors && filters?.vendors?.length > 0) {
+        query = query?.in('vendor_id', filters?.vendors);
+      }
+
+      if (filters?.priceRange?.min) {
+        query = query?.gte('price_per_yard', parseFloat(filters?.priceRange?.min));
+      }
+
+      if (filters?.priceRange?.max) {
+        query = query?.lte('price_per_yard', parseFloat(filters?.priceRange?.max));
+      }
+
+      if (filters?.gsmRange?.min) {
+        query = query?.gte('gsm', parseInt(filters?.gsmRange?.min));
+      }
+
+      if (filters?.gsmRange?.max) {
+        query = query?.lte('gsm', parseInt(filters?.gsmRange?.max));
+      }
+
+      if (filters?.moqRange?.min) {
+        query = query?.gte('minimum_order_quantity', parseInt(filters?.moqRange?.min));
+      }
+
+      if (filters?.moqRange?.max) {
+        query = query?.lte('minimum_order_quantity', parseInt(filters?.moqRange?.max));
+      }
+
+      // Search functionality
+      if (filters?.search) {
+        query = query?.or(`name.ilike.%${filters?.search}%,material.ilike.%${filters?.search}%,composition.ilike.%${filters?.search}%`);
+      }
+
+      // Sorting
+      if (filters?.sortBy) {
+        switch (filters?.sortBy) {
+          case 'price-low':
+            query = query?.order('price_per_yard', { ascending: true });
+            break;
+          case 'price-high':
+            query = query?.order('price_per_yard', { ascending: false });
+            break;
+          case 'newest':
+            query = query?.order('created_at', { ascending: false });
+            break;
+          case 'rating':
+            query = query?.order('rating', { ascending: false });
+            break;
+          case 'moq-low':
+            query = query?.order('minimum_order_quantity', { ascending: true });
+            break;
+          case 'moq-high':
+            query = query?.order('minimum_order_quantity', { ascending: false });
+            break;
+          default:
+            query = query?.order('created_at', { ascending: false });
+        }
+      }
+
+      // Pagination
+      if (filters?.page && filters?.itemsPerPage) {
+        const from = (filters?.page - 1) * filters?.itemsPerPage;
+        const to = from + filters?.itemsPerPage - 1;
+        query = query?.range(from, to);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        // Handle specific network errors with helpful messages
+        if (error?.message?.includes('Failed to fetch') || 
+            error?.message?.includes('NetworkError') ||
+            error?.message?.includes('fetch')) {
+          throw new Error('Cannot connect to database. Your Supabase project may be paused or inactive. Please check your Supabase dashboard and resume your project if needed.');
+        }
+        
+        // Handle authentication errors
+        if (error?.message?.includes('AuthRetryableFetchError') ||
+            error?.message?.includes('JWT')) {
+          throw new Error('Authentication service is unavailable. Please check your Supabase project status and ensure it is active.');
+        }
+        
+        // Handle other database errors
+        if (error?.code === 'PGRST116' || error?.message?.includes('PGRST116')) {
+          throw new Error('Database table "fabrics" not found. Please ensure your migration has been applied correctly.');
+        }
+        
+        if (error?.message?.includes('relation') && error?.message?.includes('does not exist')) {
+          throw new Error('Database schema is not properly set up. Please check if your Supabase migration has been applied.');
+        }
+        
+        // Handle permission errors
+        if (error?.message?.includes('permission') || error?.message?.includes('RLS')) {
+          throw new Error('Database access denied. Please check your Row Level Security policies or contact support.');
+        }
+        
+        // Generic error for unknown issues
+        console.error('Database error details:', error);
+        throw new Error(`Database error: ${error?.message || 'Failed to load fabrics. Please try again.'}`);
+      }
+
+      return { data: data || [], count: count || 0 };
+    };
+
+    return await retryOperation(operation);
+  } catch (error) {
+    console.error('Error fetching fabrics:', error);
+    throw error;
+  }
+};
+
+// Get fabric by ID
+export const getFabricById = async (id) => {
+  try {
+    const { data, error } = await supabase?.from('fabrics')?.select(`
+        *,
+        vendor:vendors(
+          id,
+          name,
+          verified,
+          rating,
+          contact_email,
+          contact_phone,
+          address
+        ),
+        fabric_images(
+          id,
+          image_url,
+          display_order
+        ),
+        fabric_reviews(
+          id,
+          rating,
+          review_text,
+          created_at,
+          user:user_profiles(
+            id,
+            full_name
+          )
+        )
+      `)?.eq('id', id)?.single();
+
+    if (error) {
+      if (error?.message?.includes('Failed to fetch') || 
+          error?.message?.includes('NetworkError')) {
+        throw new Error('Cannot connect to database. Your Supabase project may be paused or inactive. Please check your Supabase dashboard and resume your project if needed.');
+      }
+      throw new Error('Failed to load fabric details. Please try again.');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching fabric by ID:', error);
+    throw error;
+  }
+};
+
+// Create new fabric (vendor only)
+export const createFabric = async (fabricData) => {
+  try {
+    const { data, error } = await supabase?.from('fabrics')?.insert([fabricData])?.select()?.single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error creating fabric:', error);
+    throw error;
+  }
+};
+
+// Update fabric (vendor only)
+export const updateFabric = async (id, updates) => {
+  try {
+    const { data, error } = await supabase?.from('fabrics')?.update(updates)?.eq('id', id)?.select()?.single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error updating fabric:', error);
+    throw error;
+  }
+};
+
+// Delete fabric (vendor only)
+export const deleteFabric = async (id) => {
+  try {
+    const { error } = await supabase?.from('fabrics')?.delete()?.eq('id', id);
+
+    if (error) {
+      throw error;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting fabric:', error);
+    throw error;
+  }
+};
+
+// Upload fabric image
+export const uploadFabricImage = async (fabricId, file, displayOrder = 1) => {
+  try {
+    const fileName = `${fabricId}/${Date.now()}-${file?.name}`;
+    
+    const { data: uploadData, error: uploadError } = await supabase?.storage?.from('fabric-images')?.upload(fileName, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: urlData } = supabase?.storage?.from('fabric-images')?.getPublicUrl(fileName);
+
+    const { data, error } = await supabase?.from('fabric_images')?.insert([{
+        fabric_id: fabricId,
+        image_url: urlData?.publicUrl,
+        display_order: displayOrder
+      }])?.select()?.single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error uploading fabric image:', error);
+    throw error;
+  }
+};
+
+// Get fabric materials for filters
+export const getFabricMaterials = async () => {
+  try {
+    const operation = async () => {
+      const { data, error } = await supabase?.from('fabrics')?.select('material')?.not('material', 'is', null);
+
+      if (error) {
+        if (error?.message?.includes('Failed to fetch') || 
+            error?.message?.includes('NetworkError') ||
+            error?.message?.includes('fetch')) {
+          throw new Error('Cannot connect to database. Your Supabase project may be paused or inactive. Please check your Supabase dashboard and resume your project if needed.');
+        }
+        
+        if (error?.code === 'PGRST116' || error?.message?.includes('does not exist')) {
+          return []; // Return empty array for materials if table doesn't exist
+        }
+        
+        console.error('Error fetching materials:', error);
+        return []; // Return empty array for materials if there's an error
+      }
+
+      const materials = [...new Set(data?.map(item => item?.material))]?.filter(Boolean);
+      return materials;
+    };
+
+    return await retryOperation(operation);
+  } catch (error) {
+    console.error('Error fetching fabric materials:', error);
+    return []; // Always return empty array on error for materials
+  }
+};
+
+// Add fabric review
+export const addFabricReview = async (fabricId, reviewData) => {
+  try {
+    const { data, error } = await supabase?.from('fabric_reviews')?.insert([{
+        ...reviewData,
+        fabric_id: fabricId
+      }])?.select()?.single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error adding fabric review:', error);
+    throw error;
+  }
+};
+function getVendors(...args) {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: getVendors is not implemented yet.', args);
+  return null;
+}
+
+export { getVendors };

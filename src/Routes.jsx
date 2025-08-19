@@ -19,11 +19,11 @@ const Routes = () => {
       <Route path="/" element={<FabricCatalogBrowse />} />
       <Route path="/fabric-catalog-browse" element={<FabricCatalogBrowse />} />
       <Route path="/designer-directory-profiles" element={<DesignerDirectoryProfiles />} />
-      <Route path="/vendor-dashboard-inventory" element={<VendorDashboardInventory />} />
       <Route path="/fabric-product-detail" element={<FabricProductDetail />} />
       <Route path="/fabric-product-detail/:id" element={<FabricProductDetail />} />
       <Route path="/shopping-cart-checkout" element={<ShoppingCartCheckout />} />
       <Route path="/order-management-dashboard" element={<OrderManagementDashboard />} />
+      <Route path="/vendor-dashboard-inventory" element={<VendorDashboardInventory />} />
       <Route path="/admin-control-panel" element={<AdminControlPanel />} />
       
       {/* Authentication routes - accessible in preview mode */}
