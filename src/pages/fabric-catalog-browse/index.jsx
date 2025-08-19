@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { getFabrics, getFabricMaterials } from '../../services/fabricService';
 import { mockFabrics } from '../../data/seed.js';
 import SearchToolbar from './components/SearchToolbar';
-import FilterSidebar from './components/FilterSidebar';
-import FabricGrid from './components/FabricGrid';
-import Pagination from './components/Pagination';
-import QuickPreviewModal from './components/QuickPreviewModal';
+import FilterSidebar from './components/FilterSidebar.jsx';
+import FabricGrid from './components/FabricGrid.jsx';
+import Pagination from '../order-management-dashboard/components/Pagination.jsx';
+import QuickPreviewModal from './components/QuickPreviewModal.jsx';
 
 const FabricCatalogBrowse = () => {
-  const [fabrics, setFabrics] = useState([]);
+  const [fabrics, setFabrics] = useState(mockFabrics);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -31,13 +31,21 @@ const FabricCatalogBrowse = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
+    // Initialize with mock data immediately
+    setFabrics(mockFabrics);
+    setPagination(prev => ({
+      ...prev,
+      totalItems: mockFabrics.length
+    }));
+    setLoading(false);
+    
+    // Try to load real data in background
     loadFabrics();
     loadMaterials();
   }, [filters, pagination.currentPage]);
 
   const loadFabrics = async () => {
     try {
-      setLoading(true);
       setError(null);
       
       const filterParams = {
@@ -48,10 +56,10 @@ const FabricCatalogBrowse = () => {
       
       try {
         const result = await getFabrics(filterParams);
-        setFabrics(result.data || []);
+        setFabrics(result.data || mockFabrics);
         setPagination(prev => ({
           ...prev,
-          totalItems: result.count || 0
+          totalItems: result.count || mockFabrics.length
         }));
       } catch (err) {
         console.warn('Using mock data:', err.message);
@@ -74,15 +82,21 @@ const FabricCatalogBrowse = () => {
           );
         }
         
-        setFabrics(filteredData);
+        setFabrics(filteredData.length > 0 ? filteredData : mockFabrics);
         setPagination(prev => ({
           ...prev,
-          totalItems: filteredData.length
+          totalItems: filteredData.length > 0 ? filteredData.length : mockFabrics.length
         }));
       }
     } catch (err) {
       console.error('Error loading fabrics:', err);
       setError(err.message || 'Failed to load fabrics');
+      // Fallback to mock data on error
+      setFabrics(mockFabrics);
+      setPagination(prev => ({
+        ...prev,
+        totalItems: mockFabrics.length
+      }));
     } finally {
       setLoading(false);
     }
@@ -91,9 +105,11 @@ const FabricCatalogBrowse = () => {
   const loadMaterials = async () => {
     try {
       const materials = await getFabricMaterials();
-      setAvailableMaterials(materials || []);
+      setAvailableMaterials(materials || ['Cotton', 'Silk', 'Linen', 'Denim', 'Wool', 'Bamboo']);
     } catch (err) {
       console.error('Error loading materials:', err);
+      // Fallback to default materials
+      setAvailableMaterials(['Cotton', 'Silk', 'Linen', 'Denim', 'Wool', 'Bamboo']);
     }
   };
 
