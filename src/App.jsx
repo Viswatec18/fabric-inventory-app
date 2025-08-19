@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getFabrics, getFabricMaterials } from './services/fabricService';
 import { mockFabrics } from './data/seed.js';
-import SearchToolbar from './components/SearchToolbar';
-import FilterSidebar from './components/FilterSidebar';
-import FabricGrid from './components/FabricGrid';
+import SearchToolbar from './pages/fabric-catalog-browse/components/SearchToolbar';
+import FilterSidebar from './pages/fabric-catalog-browse/components/FilterSidebar.jsx';
+import FabricGrid from './pages/fabric-catalog-browse/components/FabricGrid.jsx';
 import Pagination from './components/Pagination';
-import QuickPreviewModal from './components/QuickPreviewModal';
+import QuickPreviewModal from './pages/fabric-catalog-browse/components/QuickPreviewModal.jsx';
 
 const FabricCatalogBrowse = () => {
   const [fabrics, setFabrics] = useState([]);
