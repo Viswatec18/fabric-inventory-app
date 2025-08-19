@@ -2,6 +2,7 @@ import React from "react";
 import { Routes as RouterRoutes, Route } from "react-router-dom";
 
 // Import all page components
+import HomePage from "./pages/home";
 import FabricCatalogBrowse from "./pages/fabric-catalog-browse";
 import DesignerDirectoryProfiles from "./pages/designer-directory-profiles";
 import VendorDashboardInventory from "./pages/vendor-dashboard-inventory";
@@ -16,7 +17,7 @@ const Routes = () => {
   return (
     <RouterRoutes>
       {/* Main application routes */}
-      <Route path="/" element={<FabricCatalogBrowse />} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/fabric-catalog-browse" element={<FabricCatalogBrowse />} />
       <Route path="/designer-directory-profiles" element={<DesignerDirectoryProfiles />} />
       <Route path="/fabric-product-detail" element={<FabricProductDetail />} />
