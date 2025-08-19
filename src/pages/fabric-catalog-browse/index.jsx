@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { getFabrics, getFabricMaterials } from '../../services/fabricService';
 import { mockFabrics } from '../../data/seed.js';
 import SearchToolbar from './components/SearchToolbar';
-import FilterSidebar from './components/FilterSidebar.jsx';
-import FabricGrid from './components/FabricGrid.jsx';
-import Pagination from '../order-management-dashboard/components/Pagination.jsx';
-import QuickPreviewModal from './components/QuickPreviewModal.jsx';
+import FilterSidebar from './components/FilterSidebar';
+import FabricGrid from './components/FabricGrid';
+import Pagination from './components/Pagination';
+import QuickPreviewModal from './components/QuickPreviewModal';
 
 const FabricCatalogBrowse = () => {
-  const [fabrics, setFabrics] = useState(mockFabrics);
-  const [loading, setLoading] = useState(true);
+  const [fabrics, setFabrics] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     materials: [],
@@ -24,94 +24,74 @@ const FabricCatalogBrowse = () => {
     itemsPerPage: 24,
     totalItems: 0
   });
-  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [availableMaterials, setAvailableMaterials] = useState(['Cotton', 'Silk', 'Linen', 'Denim', 'Wool', 'Bamboo']);
   const [viewMode, setViewMode] = useState('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedFabric, setSelectedFabric] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
-    // Initialize with mock data immediately
+    // Set mock data immediately and show it
+    console.log('Setting mock fabrics:', mockFabrics);
     setFabrics(mockFabrics);
-    setPagination(prev => ({
-      ...prev,
-      totalItems: mockFabrics.length
-    }));
-    setLoading(false);
-    
-    // Try to load real data in background
-    loadFabrics();
-    loadMaterials();
+    setPagination(prev => ({ ...prev, totalItems: mockFabrics.length }));
   }, [filters, pagination.currentPage]);
 
-  const loadFabrics = async () => {
-    try {
-      setError(null);
-      
-      const filterParams = {
-        ...filters,
-        page: pagination.currentPage,
-        itemsPerPage: pagination.itemsPerPage
-      };
-      
-      try {
-        const result = await getFabrics(filterParams);
-        setFabrics(result.data || mockFabrics);
-        setPagination(prev => ({
-          ...prev,
-          totalItems: result.count || mockFabrics.length
-        }));
-      } catch (err) {
-        console.warn('Using mock data:', err.message);
-        // Use mock data as fallback
-        let filteredData = [...mockFabrics];
-        
-        // Apply client-side filtering
-        if (filters.materials?.length > 0) {
-          filteredData = filteredData.filter(fabric => 
-            filters.materials.includes(fabric.material)
-          );
-        }
-        
-        if (filters.search) {
-          const searchLower = filters.search.toLowerCase();
-          filteredData = filteredData.filter(fabric =>
-            fabric.name.toLowerCase().includes(searchLower) ||
-            fabric.material.toLowerCase().includes(searchLower) ||
-            fabric.description.toLowerCase().includes(searchLower)
-          );
-        }
-        
-        setFabrics(filteredData.length > 0 ? filteredData : mockFabrics);
-        setPagination(prev => ({
-          ...prev,
-          totalItems: filteredData.length > 0 ? filteredData.length : mockFabrics.length
-        }));
-      }
-    } catch (err) {
-      console.error('Error loading fabrics:', err);
-      setError(err.message || 'Failed to load fabrics');
-      // Fallback to mock data on error
-      setFabrics(mockFabrics);
-      setPagination(prev => ({
-        ...prev,
-        totalItems: mockFabrics.length
-      }));
-    } finally {
-      setLoading(false);
+  // Apply client-side filtering to mock data
+  const getFilteredFabrics = () => {
+    let filtered = [...mockFabrics];
+
+    if (filters.materials?.length > 0) {
+      filtered = filtered.filter(fabric => 
+        filters.materials.includes(fabric.material)
+      );
     }
+
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(fabric =>
+        fabric.name.toLowerCase().includes(searchLower) ||
+        fabric.material.toLowerCase().includes(searchLower) ||
+        fabric.description.toLowerCase().includes(searchLower)
+      );
+    }
+
+    if (filters.priceRange?.min) {
+      filtered = filtered.filter(fabric => 
+        fabric.price_per_yard >= parseFloat(filters.priceRange.min)
+      );
+    }
+
+    if (filters.priceRange?.max) {
+      filtered = filtered.filter(fabric => 
+        fabric.price_per_yard <= parseFloat(filters.priceRange.max)
+      );
+    }
+
+    // Apply sorting
+    if (filters.sortBy) {
+      switch (filters.sortBy) {
+        case 'price-low':
+          filtered.sort((a, b) => a.price_per_yard - b.price_per_yard);
+          break;
+        case 'price-high':
+          filtered.sort((a, b) => b.price_per_yard - a.price_per_yard);
+          break;
+        case 'rating':
+          filtered.sort((a, b) => b.rating - a.rating);
+          break;
+        case 'name':
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        default:
+          break;
+      }
+    }
+
+    return filtered;
   };
 
-  const loadMaterials = async () => {
-    try {
-      const materials = await getFabricMaterials();
-      setAvailableMaterials(materials || ['Cotton', 'Silk', 'Linen', 'Denim', 'Wool', 'Bamboo']);
-    } catch (err) {
-      console.error('Error loading materials:', err);
-      // Fallback to default materials
-      setAvailableMaterials(['Cotton', 'Silk', 'Linen', 'Denim', 'Wool', 'Bamboo']);
-    }
-  };
+  const filteredFabrics = getFilteredFabrics();
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
@@ -132,27 +112,7 @@ const FabricCatalogBrowse = () => {
     setSelectedFabric(null);
   };
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-foreground mb-4">Error Loading Fabrics</h2>
-          <p className="text-muted-foreground mb-4">{error}</p>
-          <button
-            onClick={loadFabrics}
-            className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+  console.log('Rendering with fabrics:', filteredFabrics.length);
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,7 +124,7 @@ const FabricCatalogBrowse = () => {
           onSortChange={(sort) => setFilters(prev => ({ ...prev, sortBy: sort }))}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
-          resultsCount={pagination.totalItems}
+          resultsCount={filteredFabrics.length}
           onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
           filters={filters}
           onFiltersChange={handleFilterChange}
@@ -190,18 +150,18 @@ const FabricCatalogBrowse = () => {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto p-6">
               <FabricGrid 
-                fabrics={fabrics}
+                fabrics={filteredFabrics}
                 viewMode={viewMode}
                 isLoading={loading}
                 onQuickPreview={handleQuickPreview}
               />
             </div>
             
-            {!loading && fabrics.length > 0 && (
+            {!loading && filteredFabrics.length > 0 && (
               <Pagination
                 currentPage={pagination.currentPage}
-                totalPages={Math.ceil(pagination.totalItems / pagination.itemsPerPage)}
-                totalItems={pagination.totalItems}
+                totalPages={Math.ceil(filteredFabrics.length / pagination.itemsPerPage)}
+                totalItems={filteredFabrics.length}
                 itemsPerPage={pagination.itemsPerPage}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={(itemsPerPage) => 
