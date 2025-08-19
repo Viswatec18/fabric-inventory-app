@@ -134,3 +134,5 @@ const Sidebar = ({ isOpen }) => {
 };
 
 export default Sidebar;
+
+export { Sidebar }

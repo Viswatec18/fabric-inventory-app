@@ -72,3 +72,5 @@ const Topbar = ({ onMenuToggle, isMenuOpen }) => {
 };
 
 export default Topbar;
+
+export { Topbar }
