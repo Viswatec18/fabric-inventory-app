@@ -142,14 +142,14 @@ const FabricCatalogBrowse = () => {
     <div className="min-h-screen bg-bg">
       <div className="h-full flex flex-col">
         <SearchToolbar 
-          searchQuery={searchQuery}
+          searchQuery={filters.search}
           onSearchChange={(query) => setFilters(prev => ({ ...prev, search: query }))}
-          sortBy={sortBy}
+          sortBy={filters.sortBy}
           onSortChange={(sort) => setFilters(prev => ({ ...prev, sortBy: sort }))}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           resultsCount={pagination.totalItems}
-          onFilterToggle={handleFilterToggle}
+          onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
           filters={filters}
           onFiltersChange={handleFilterChange}
         />
@@ -159,7 +159,7 @@ const FabricCatalogBrowse = () => {
             filters={filters}
             onFiltersChange={handleFilterChange}
             isOpen={isFilterOpen}
-            onToggle={handleFilterToggle}
+            onToggle={() => setIsFilterOpen(!isFilterOpen)}
             onClearAll={() => setFilters({
               materials: [],
               priceRange: { min: '', max: '' },
