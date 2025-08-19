@@ -4,7 +4,7 @@ import { mockFabrics } from './data/seed.js';
 import SearchToolbar from './pages/fabric-catalog-browse/components/SearchToolbar';
 import FilterSidebar from './pages/fabric-catalog-browse/components/FilterSidebar.jsx';
 import FabricGrid from './pages/fabric-catalog-browse/components/FabricGrid.jsx';
-import Pagination from './components/Pagination';
+import Pagination from './pages/order-management-dashboard/components/Pagination.jsx';
 import QuickPreviewModal from './pages/fabric-catalog-browse/components/QuickPreviewModal.jsx';
 
 const FabricCatalogBrowse = () => {
