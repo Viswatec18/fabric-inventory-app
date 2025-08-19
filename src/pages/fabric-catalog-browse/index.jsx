@@ -118,18 +118,18 @@ const FabricCatalogBrowse = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-ink mb-4">Error Loading Fabrics</h2>
-          <p className="text-ink-dim mb-4">{error}</p>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Error Loading Fabrics</h2>
+          <p className="text-muted-foreground mb-4">{error}</p>
           <button
             onClick={loadFabrics}
-            className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md transition-colors"
+            className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
           >
             Try Again
           </button>
@@ -139,7 +139,7 @@ const FabricCatalogBrowse = () => {
   }
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-background">
       <div className="h-full flex flex-col">
         <SearchToolbar 
           searchQuery={filters.search}

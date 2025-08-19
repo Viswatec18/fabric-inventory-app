@@ -1,156 +1,210 @@
-import React, { useState } from 'react';
-import { Search, Menu, X, Play, Square, RotateCcw, Settings, User, Bell } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { getFabrics, getFabricMaterials } from '../../services/fabricService';
+import { mockFabrics } from '../../data/seed.js';
+import SearchToolbar from './components/SearchToolbar';
+import FilterSidebar from './components/FilterSidebar';
+import FabricGrid from './components/FabricGrid';
+import Pagination from './components/Pagination';
+import QuickPreviewModal from './components/QuickPreviewModal';
 
-const Topbar = ({ onMenuToggle, isMenuOpen }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isRunning, setIsRunning] = useState(true);
+const FabricCatalogBrowse = () => {
+  const [fabrics, setFabrics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    materials: [],
+    priceRange: { min: '', max: '' },
+    gsmRange: { min: '', max: '' },
+    moqRange: { min: '', max: '' },
+    search: '',
+    sortBy: 'newest'
+  });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 24,
+    totalItems: 0
+  });
+  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [viewMode, setViewMode] = useState('grid');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedFabric, setSelectedFabric] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log('Searching for:', searchQuery);
-  };
+  useEffect(() => {
+    loadFabrics();
+    loadMaterials();
+  }, [filters, pagination.currentPage]);
 
-  const handleRun = () => {
-    setIsRunning(!isRunning);
-    console.log(isRunning ? 'Stopping application...' : 'Starting application...');
-  };
-
-  const handleRestart = () => {
-    console.log('Restarting application...');
-    setIsRunning(false);
-    setTimeout(() => setIsRunning(true), 1000);
-  };
-
-  const handleDocsClick = () => {
+  const loadFabrics = async () => {
     try {
-      window.open('https://docs.fabrichub.com', '_blank');
-    } catch (error) {
-      console.error('Failed to open docs:', error);
-      window.location.href = '/docs';
+      setLoading(true);
+      setError(null);
+      
+      const filterParams = {
+        ...filters,
+        page: pagination.currentPage,
+        itemsPerPage: pagination.itemsPerPage
+      };
+      
+      try {
+        const result = await getFabrics(filterParams);
+        setFabrics(result.data || []);
+        setPagination(prev => ({
+          ...prev,
+          totalItems: result.count || 0
+        }));
+      } catch (err) {
+        console.warn('Using mock data:', err.message);
+        // Use mock data as fallback
+        let filteredData = [...mockFabrics];
+        
+        // Apply client-side filtering
+        if (filters.materials?.length > 0) {
+          filteredData = filteredData.filter(fabric => 
+            filters.materials.includes(fabric.material)
+          );
+        }
+        
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          filteredData = filteredData.filter(fabric =>
+            fabric.name.toLowerCase().includes(searchLower) ||
+            fabric.material.toLowerCase().includes(searchLower) ||
+            fabric.description.toLowerCase().includes(searchLower)
+          );
+        }
+        
+        setFabrics(filteredData);
+        setPagination(prev => ({
+          ...prev,
+          totalItems: filteredData.length
+        }));
+      }
+    } catch (err) {
+      console.error('Error loading fabrics:', err);
+      setError(err.message || 'Failed to load fabrics');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGetStartedClick = () => {
+  const loadMaterials = async () => {
     try {
-      window.location.href = '/login-registration';
-    } catch (error) {
-      console.error('Navigation failed:', error);
-      window.location.href = '/get-started';
+      const materials = await getFabricMaterials();
+      setAvailableMaterials(materials || []);
+    } catch (err) {
+      console.error('Error loading materials:', err);
     }
   };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+  };
+
+  const handlePageChange = (page) => {
+    setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
+  const handleQuickPreview = (fabric) => {
+    setSelectedFabric(fabric);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setSelectedFabric(null);
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-ink mb-4">Error Loading Fabrics</h2>
+          <p className="text-ink-dim mb-4">{error}</p>
+          <button
+            onClick={loadFabrics}
+            className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-bg-elevate border-b border-border px-4 py-2 flex items-center justify-between">
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={onMenuToggle}
-          className="text-ink-dim hover:text-ink p-1 rounded transition-colors"
-          type="button"
-        >
-          {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+    <div className="min-h-screen bg-bg">
+      <div className="h-full flex flex-col">
+        <SearchToolbar 
+          searchQuery={filters.search}
+          onSearchChange={(query) => setFilters(prev => ({ ...prev, search: query }))}
+          sortBy={filters.sortBy}
+          onSortChange={(sort) => setFilters(prev => ({ ...prev, sortBy: sort }))}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          resultsCount={pagination.totalItems}
+          onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
+          filters={filters}
+          onFiltersChange={handleFilterChange}
+        />
         
-        {/* Project Info */}
-        <div className="flex items-center space-x-3">
-          <div className="w-6 h-6 bg-accent rounded flex items-center justify-center">
-            <span className="text-white text-xs font-bold">F</span>
-          </div>
-          <div>
-            <div className="text-sm font-medium text-ink">FabricHub</div>
-            <div className="text-xs text-ink-dim">B2B Textile Marketplace</div>
-          </div>
-        </div>
-
-        {/* Run Controls */}
-        <div className="flex items-center space-x-2 ml-6">
-          <button
-            onClick={handleRun}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              isRunning 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-green-600 hover:bg-green-700 text-white'
-            }`}
-            type="button"
-          >
-            {isRunning ? <Square size={14} /> : <Play size={14} />}
-            <span>{isRunning ? 'Stop' : 'Run'}</span>
-          </button>
+        <div className="flex flex-1 overflow-hidden">
+          <FilterSidebar
+            filters={filters}
+            onFiltersChange={handleFilterChange}
+            isOpen={isFilterOpen}
+            onToggle={() => setIsFilterOpen(!isFilterOpen)}
+            onClearAll={() => setFilters({
+              materials: [],
+              priceRange: { min: '', max: '' },
+              gsmRange: { min: '', max: '' },
+              moqRange: { min: '', max: '' },
+              search: '',
+              sortBy: 'newest'
+            })}
+            availableMaterials={availableMaterials}
+          />
           
-          <button
-            onClick={handleRestart}
-            className="p-1.5 text-ink-dim hover:text-ink hover:bg-bg-soft rounded-md transition-colors"
-            type="button"
-            title="Restart"
-          >
-            <RotateCcw size={16} />
-          </button>
-        </div>
-        
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-md">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-ink-mute" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search files, fabrics, designers..."
-              className="w-full bg-bg-soft text-ink placeholder-ink-mute border border-border rounded-md pl-10 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-            />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-auto p-6">
+              <FabricGrid 
+                fabrics={fabrics}
+                viewMode={viewMode}
+                isLoading={loading}
+                onQuickPreview={handleQuickPreview}
+              />
+            </div>
+            
+            {!loading && fabrics.length > 0 && (
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={Math.ceil(pagination.totalItems / pagination.itemsPerPage)}
+                totalItems={pagination.totalItems}
+                itemsPerPage={pagination.itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={(itemsPerPage) => 
+                  setPagination(prev => ({ ...prev, itemsPerPage, currentPage: 1 }))
+                }
+              />
+            )}
           </div>
-        </form>
+        </div>
       </div>
 
-      <div className="flex items-center space-x-3">
-        {/* Status Indicator */}
-        <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-green-500' : 'bg-red-500'}`}></div>
-          <span className="text-xs text-ink-dim">
-            {isRunning ? 'Running' : 'Stopped'}
-          </span>
-        </div>
-
-        {/* Notifications */}
-        <button
-          className="p-1.5 text-ink-dim hover:text-ink hover:bg-bg-soft rounded-md transition-colors relative"
-          type="button"
-        >
-          <Bell size={16} />
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full flex items-center justify-center">
-            <span className="text-white text-xs">3</span>
-          </div>
-        </button>
-
-        {/* Settings */}
-        <button
-          className="p-1.5 text-ink-dim hover:text-ink hover:bg-bg-soft rounded-md transition-colors"
-          type="button"
-        >
-          <Settings size={16} />
-        </button>
-
-        {/* User Menu */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleDocsClick}
-            className="text-ink-dim hover:text-ink text-sm px-3 py-1.5 rounded-md hover:bg-bg-soft transition-colors"
-            type="button"
-          >
-            Docs
-          </button>
-          <button
-            onClick={handleGetStartedClick}
-            className="bg-accent hover:bg-accent-hover text-white text-sm px-3 py-1.5 rounded-md transition-colors font-medium"
-            type="button"
-          >
-            Get Started
-          </button>
-        </div>
-      </div>
+      {/* Quick Preview Modal */}
+      <QuickPreviewModal
+        fabric={selectedFabric}
+        isOpen={isPreviewOpen}
+        onClose={handleClosePreview}
+      />
     </div>
   );
 };
 
-export default Topbar;
-
-export { Topbar }
+export default FabricCatalogBrowse;

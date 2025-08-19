@@ -1,112 +1,210 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getFabrics, getFabricMaterials } from '../../services/fabricService';
+import { mockFabrics } from '../../data/seed.js';
+import SearchToolbar from './components/SearchToolbar';
+import FilterSidebar from './components/FilterSidebar';
+import FabricGrid from './components/FabricGrid';
+import Pagination from './components/Pagination';
+import QuickPreviewModal from './components/QuickPreviewModal';
 
-const AppShell = ({ sidebar, topbar, editor, terminal }) => {
-  const [sidebarWidth, setSidebarWidth] = useState(280);
-  const [isResizingSidebar, setIsResizingSidebar] = useState(false);
-  const [terminalHeight, setTerminalHeight] = useState(200);
-  const [isResizingTerminal, setIsResizingTerminal] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  
-  const sidebarRef = useRef(null);
-  const terminalRef = useRef(null);
+const FabricCatalogBrowse = () => {
+  const [fabrics, setFabrics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    materials: [],
+    priceRange: { min: '', max: '' },
+    gsmRange: { min: '', max: '' },
+    moqRange: { min: '', max: '' },
+    search: '',
+    sortBy: 'newest'
+  });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 24,
+    totalItems: 0
+  });
+  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [viewMode, setViewMode] = useState('grid');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedFabric, setSelectedFabric] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (isResizingSidebar) {
-        const newWidth = Math.max(200, Math.min(400, e.clientX));
-        setSidebarWidth(newWidth);
-      }
-      if (isResizingTerminal) {
-        const containerHeight = window.innerHeight - 48; // Subtract topbar height
-        const newHeight = Math.max(100, Math.min(containerHeight * 0.6, containerHeight - e.clientY + 48));
-        setTerminalHeight(newHeight);
-      }
-    };
+    loadFabrics();
+    loadMaterials();
+  }, [filters, pagination.currentPage]);
 
-    const handleMouseUp = () => {
-      setIsResizingSidebar(false);
-      setIsResizingTerminal(false);
-    };
-
-    if (isResizingSidebar || isResizingTerminal) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+  const loadFabrics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const filterParams = {
+        ...filters,
+        page: pagination.currentPage,
+        itemsPerPage: pagination.itemsPerPage
+      };
+      
+      try {
+        const result = await getFabrics(filterParams);
+        setFabrics(result.data || []);
+        setPagination(prev => ({
+          ...prev,
+          totalItems: result.count || 0
+        }));
+      } catch (err) {
+        console.warn('Using mock data:', err.message);
+        // Use mock data as fallback
+        let filteredData = [...mockFabrics];
+        
+        // Apply client-side filtering
+        if (filters.materials?.length > 0) {
+          filteredData = filteredData.filter(fabric => 
+            filters.materials.includes(fabric.material)
+          );
+        }
+        
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          filteredData = filteredData.filter(fabric =>
+            fabric.name.toLowerCase().includes(searchLower) ||
+            fabric.material.toLowerCase().includes(searchLower) ||
+            fabric.description.toLowerCase().includes(searchLower)
+          );
+        }
+        
+        setFabrics(filteredData);
+        setPagination(prev => ({
+          ...prev,
+          totalItems: filteredData.length
+        }));
+      }
+    } catch (err) {
+      console.error('Error loading fabrics:', err);
+      setError(err.message || 'Failed to load fabrics');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizingSidebar, isResizingTerminal]);
+  const loadMaterials = async () => {
+    try {
+      const materials = await getFabricMaterials();
+      setAvailableMaterials(materials || []);
+    } catch (err) {
+      console.error('Error loading materials:', err);
+    }
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+  };
+
+  const handlePageChange = (page) => {
+    setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
+  const handleQuickPreview = (fabric) => {
+    setSelectedFabric(fabric);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setSelectedFabric(null);
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-ink mb-4">Error Loading Fabrics</h2>
+          <p className="text-ink-dim mb-4">{error}</p>
+          <button
+            onClick={loadFabrics}
+            className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-screen bg-bg text-ink grid grid-rows-[48px_1fr] overflow-hidden">
-      {/* Top bar */}
-      <div className="bg-bg-elevate border-b border-border">
-        {topbar}
-      </div>
-      
-      {/* Main content area */}
-      <div className="flex overflow-hidden">
-        {/* Sidebar */}
-        <div 
-          ref={sidebarRef}
-          className={`bg-bg-soft border-r border-border flex-shrink-0 relative transition-all duration-300 ${
-            isSidebarCollapsed ? 'w-12' : ''
-          }`}
-          style={{ width: isSidebarCollapsed ? '48px' : `${sidebarWidth}px` }}
-        >
-          {/* Sidebar Toggle */}
-          <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="absolute top-4 -right-3 w-6 h-6 bg-bg-elevate border border-border rounded-full flex items-center justify-center hover:bg-bg-soft transition-colors z-10"
-          >
-            <svg 
-              className={`w-3 h-3 text-ink-dim transition-transform ${isSidebarCollapsed ? 'rotate-180' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          
-          {sidebar}
-          
-          {/* Sidebar resize handle */}
-          {!isSidebarCollapsed && (
-            <div
-              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-accent-soft transition-colors"
-              onMouseDown={() => setIsResizingSidebar(true)}
-            />
-          )}
-        </div>
+    <div className="min-h-screen bg-bg">
+      <div className="h-full flex flex-col">
+        <SearchToolbar 
+          searchQuery={filters.search}
+          onSearchChange={(query) => setFilters(prev => ({ ...prev, search: query }))}
+          sortBy={filters.sortBy}
+          onSortChange={(sort) => setFilters(prev => ({ ...prev, sortBy: sort }))}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          resultsCount={pagination.totalItems}
+          onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
+          filters={filters}
+          onFiltersChange={handleFilterChange}
+        />
         
-        {/* Main content area with editor/terminal split */}
-        <div className="flex-1 bg-bg overflow-hidden flex flex-col">
-          {/* Editor area */}
-          <div className="flex-1 overflow-hidden" style={{ height: `calc(100% - ${terminalHeight}px)` }}>
-            {editor}
-          </div>
-          
-          {/* Terminal resize handle */}
-          <div
-            className="h-1 bg-border cursor-row-resize hover:bg-accent-soft transition-colors flex-shrink-0"
-            onMouseDown={() => setIsResizingTerminal(true)}
+        <div className="flex flex-1 overflow-hidden">
+          <FilterSidebar
+            filters={filters}
+            onFiltersChange={handleFilterChange}
+            isOpen={isFilterOpen}
+            onToggle={() => setIsFilterOpen(!isFilterOpen)}
+            onClearAll={() => setFilters({
+              materials: [],
+              priceRange: { min: '', max: '' },
+              gsmRange: { min: '', max: '' },
+              moqRange: { min: '', max: '' },
+              search: '',
+              sortBy: 'newest'
+            })}
+            availableMaterials={availableMaterials}
           />
           
-          {/* Terminal area */}
-          <div 
-            ref={terminalRef}
-            className="bg-bg-elevate border-t border-border flex-shrink-0 overflow-hidden"
-            style={{ height: `${terminalHeight}px` }}
-          >
-            {terminal}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-auto p-6">
+              <FabricGrid 
+                fabrics={fabrics}
+                viewMode={viewMode}
+                isLoading={loading}
+                onQuickPreview={handleQuickPreview}
+              />
+            </div>
+            
+            {!loading && fabrics.length > 0 && (
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={Math.ceil(pagination.totalItems / pagination.itemsPerPage)}
+                totalItems={pagination.totalItems}
+                itemsPerPage={pagination.itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={(itemsPerPage) => 
+                  setPagination(prev => ({ ...prev, itemsPerPage, currentPage: 1 }))
+                }
+              />
+            )}
           </div>
         </div>
       </div>
+
+      {/* Quick Preview Modal */}
+      <QuickPreviewModal
+        fabric={selectedFabric}
+        isOpen={isPreviewOpen}
+        onClose={handleClosePreview}
+      />
     </div>
   );
 };
 
-export default AppShell;
+export default FabricCatalogBrowse;

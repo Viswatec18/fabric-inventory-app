@@ -1,192 +1,210 @@
-import React, { useState } from 'react';
-import { Search, Filter, Grid3X3, List, SlidersHorizontal, Download, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { getFabrics, getFabricMaterials } from '../../services/fabricService';
+import { mockFabrics } from '../../data/seed.js';
+import SearchToolbar from './components/SearchToolbar';
+import FilterSidebar from './components/FilterSidebar';
+import FabricGrid from './components/FabricGrid';
+import Pagination from './components/Pagination';
+import QuickPreviewModal from './components/QuickPreviewModal';
 
-const SearchToolbar = ({
-  searchQuery = '',
-  onSearchChange,
-  sortBy = 'newest',
-  onSortChange,
-  viewMode = 'grid',
-  onViewModeChange,
-  resultsCount = 0,
-  onFilterToggle,
-  filters = {},
-  onFiltersChange
-}) => {
+const FabricCatalogBrowse = () => {
+  const [fabrics, setFabrics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    materials: [],
+    priceRange: { min: '', max: '' },
+    gsmRange: { min: '', max: '' },
+    moqRange: { min: '', max: '' },
+    search: '',
+    sortBy: 'newest'
+  });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 24,
+    totalItems: 0
+  });
+  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [viewMode, setViewMode] = useState('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedFabric, setSelectedFabric] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const sortOptions = [
-    { value: 'relevance', label: 'Relevance' },
-    { value: 'newest', label: 'Newest' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'rating', label: 'Highest Rated' },
-    { value: 'moq-low', label: 'MOQ: Low to High' },
-    { value: 'moq-high', label: 'MOQ: High to Low' }
-  ];
+  useEffect(() => {
+    loadFabrics();
+    loadMaterials();
+  }, [filters, pagination.currentPage]);
 
-  const handleFilterToggle = () => {
-    setIsFilterOpen(!isFilterOpen);
-    onFilterToggle?.();
+  const loadFabrics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const filterParams = {
+        ...filters,
+        page: pagination.currentPage,
+        itemsPerPage: pagination.itemsPerPage
+      };
+      
+      try {
+        const result = await getFabrics(filterParams);
+        setFabrics(result.data || []);
+        setPagination(prev => ({
+          ...prev,
+          totalItems: result.count || 0
+        }));
+      } catch (err) {
+        console.warn('Using mock data:', err.message);
+        // Use mock data as fallback
+        let filteredData = [...mockFabrics];
+        
+        // Apply client-side filtering
+        if (filters.materials?.length > 0) {
+          filteredData = filteredData.filter(fabric => 
+            filters.materials.includes(fabric.material)
+          );
+        }
+        
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          filteredData = filteredData.filter(fabric =>
+            fabric.name.toLowerCase().includes(searchLower) ||
+            fabric.material.toLowerCase().includes(searchLower) ||
+            fabric.description.toLowerCase().includes(searchLower)
+          );
+        }
+        
+        setFabrics(filteredData);
+        setPagination(prev => ({
+          ...prev,
+          totalItems: filteredData.length
+        }));
+      }
+    } catch (err) {
+      console.error('Error loading fabrics:', err);
+      setError(err.message || 'Failed to load fabrics');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleExport = () => {
-    console.log('Exporting fabric data...');
+  const loadMaterials = async () => {
+    try {
+      const materials = await getFabricMaterials();
+      setAvailableMaterials(materials || []);
+    } catch (err) {
+      console.error('Error loading materials:', err);
+    }
   };
 
-  const handleRefresh = () => {
-    console.log('Refreshing data...');
-    window.location.reload();
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
+
+  const handlePageChange = (page) => {
+    setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
+  const handleQuickPreview = (fabric) => {
+    setSelectedFabric(fabric);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setSelectedFabric(null);
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-ink mb-4">Error Loading Fabrics</h2>
+          <p className="text-ink-dim mb-4">{error}</p>
+          <button
+            onClick={loadFabrics}
+            className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-bg-elevate border-b border-border">
-      {/* Main Toolbar */}
-      <div className="px-6 py-4">
-        <div className="flex items-center justify-between gap-4">
-          {/* Left section - Search and Filter */}
-          <div className="flex items-center gap-4 flex-1">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-ink-mute" />
-              <input
-                type="text"
-                placeholder="Search fabrics, materials, or suppliers..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange?.(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-border rounded-lg bg-bg-soft text-ink placeholder-ink-mute focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
+    <div className="min-h-screen bg-bg">
+      <div className="h-full flex flex-col">
+        <SearchToolbar 
+          searchQuery={filters.search}
+          onSearchChange={(query) => setFilters(prev => ({ ...prev, search: query }))}
+          sortBy={filters.sortBy}
+          onSortChange={(sort) => setFilters(prev => ({ ...prev, sortBy: sort }))}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          resultsCount={pagination.totalItems}
+          onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
+          filters={filters}
+          onFiltersChange={handleFilterChange}
+        />
+        
+        <div className="flex flex-1 overflow-hidden">
+          <FilterSidebar
+            filters={filters}
+            onFiltersChange={handleFilterChange}
+            isOpen={isFilterOpen}
+            onToggle={() => setIsFilterOpen(!isFilterOpen)}
+            onClearAll={() => setFilters({
+              materials: [],
+              priceRange: { min: '', max: '' },
+              gsmRange: { min: '', max: '' },
+              moqRange: { min: '', max: '' },
+              search: '',
+              sortBy: 'newest'
+            })}
+            availableMaterials={availableMaterials}
+          />
+          
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-auto p-6">
+              <FabricGrid 
+                fabrics={fabrics}
+                viewMode={viewMode}
+                isLoading={loading}
+                onQuickPreview={handleQuickPreview}
               />
             </div>
             
-            {/* Filter Toggle */}
-            <button
-              onClick={handleFilterToggle}
-              className={`flex items-center space-x-2 px-4 py-3 rounded-lg border transition-colors ${
-                isFilterOpen 
-                  ? 'bg-accent text-white border-accent' 
-                  : 'bg-bg-soft hover:bg-bg-elevate text-ink-dim hover:text-ink border-border'
-              }`}
-              title="Toggle filters"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              <span className="hidden sm:inline">Filters</span>
-            </button>
-          </div>
-
-          {/* Center section - Results count */}
-          <div className="hidden md:flex items-center space-x-4">
-            <span className="text-sm text-ink-dim font-medium">
-              {resultsCount.toLocaleString()} fabrics
-            </span>
-            <div className="w-px h-4 bg-border"></div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-xs text-ink-dim">Live</span>
-            </div>
-          </div>
-
-          {/* Right section - Controls */}
-          <div className="flex items-center gap-3">
-            {/* Actions */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleRefresh}
-                className="p-2 text-ink-dim hover:text-ink hover:bg-bg-soft rounded-lg transition-colors"
-                title="Refresh"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
-              
-              <button
-                onClick={handleExport}
-                className="p-2 text-ink-dim hover:text-ink hover:bg-bg-soft rounded-lg transition-colors"
-                title="Export"
-              >
-                <Download className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => onSortChange?.(e.target.value)}
-              className="bg-bg-soft border border-border text-ink px-3 py-2 rounded-lg pr-8 appearance-none focus:outline-none focus:ring-2 focus:ring-accent text-sm"
-            >
-              {sortOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-
-            {/* View Mode */}
-            <div className="flex items-center bg-bg-soft rounded-lg border border-border p-1">
-              <button
-                onClick={() => onViewModeChange?.('grid')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'grid' 
-                    ? 'bg-accent text-white' 
-                    : 'text-ink-dim hover:text-ink'
-                }`}
-                title="Grid view"
-              >
-                <Grid3X3 className="w-3 h-3" />
-              </button>
-              <button
-                onClick={() => onViewModeChange?.('list')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'list' 
-                    ? 'bg-accent text-white' 
-                    : 'text-ink-dim hover:text-ink'
-                }`}
-                title="List view"
-              >
-                <List className="w-3 h-3" />
-              </button>
-            </div>
+            {!loading && fabrics.length > 0 && (
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={Math.ceil(pagination.totalItems / pagination.itemsPerPage)}
+                totalItems={pagination.totalItems}
+                itemsPerPage={pagination.itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={(itemsPerPage) => 
+                  setPagination(prev => ({ ...prev, itemsPerPage, currentPage: 1 }))
+                }
+              />
+            )}
           </div>
         </div>
       </div>
 
-      {/* Filter Bar (when expanded) */}
-      {isFilterOpen && (
-        <div className="px-6 py-4 border-t border-border bg-bg-soft">
-          <div className="flex items-center space-x-4 text-sm">
-            <span className="text-ink-dim font-medium">Active Filters:</span>
-            
-            {filters?.materials?.length > 0 && (
-              <div className="flex items-center space-x-2">
-                <span className="text-ink-dim">Materials:</span>
-                <div className="flex space-x-1">
-                  {filters.materials.map(material => (
-                    <span key={material} className="px-2 py-1 bg-accent/20 text-accent rounded text-xs">
-                      {material}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {(filters?.priceRange?.min || filters?.priceRange?.max) && (
-              <div className="flex items-center space-x-2">
-                <span className="text-ink-dim">Price:</span>
-                <span className="px-2 py-1 bg-accent/20 text-accent rounded text-xs">
-                  ${filters.priceRange?.min || 0} - ${filters.priceRange?.max || '∞'}
-                </span>
-              </div>
-            )}
-            
-            <button
-              onClick={() => onFiltersChange?.({})}
-              className="text-accent hover:text-accent-hover text-xs underline"
-            >
-              Clear all
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Quick Preview Modal */}
+      <QuickPreviewModal
+        fabric={selectedFabric}
+        isOpen={isPreviewOpen}
+        onClose={handleClosePreview}
+      />
     </div>
   );
 };
 
-export default SearchToolbar;
+export default FabricCatalogBrowse;
