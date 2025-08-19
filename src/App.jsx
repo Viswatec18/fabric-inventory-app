@@ -1,8 +1,6 @@
-//import React, { useState, useEffect } from 'react';
-//import { getFabrics, getFabricMaterials } from '../../services/fabricService';
-//import { mockFabrics } from '../../data/seed.js';
-import { getFabrics, getFabricMaterials } from './services/fabricService';
-import { mockFabrics } from './data/seed.js';
+import React, { useState, useEffect } from 'react';
+import { getFabrics, getFabricMaterials } from '../../services/fabricService';
+import { mockFabrics } from '../../data/seed.js';
 import SearchToolbar from './components/SearchToolbar';
 import FilterSidebar from './components/FilterSidebar';
 import FabricGrid from './components/FabricGrid';
