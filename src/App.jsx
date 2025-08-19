@@ -11,8 +11,8 @@ import { Tabs } from './components/layout/Tabs';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <ErrorBoundary>
           <ScrollToTop />
           <AppShell
@@ -22,8 +22,8 @@ function App() {
             terminal={<div className="font-mono text-xs text-ink-dim p-3">logs…</div>}
           />
         </ErrorBoundary>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

@@ -31,6 +31,25 @@ export default {
         success: 'var(--success)',
         warning: 'var(--warning)',
         danger: 'var(--danger)',
+        bg: {
+          DEFAULT: 'var(--bg)',
+          soft: 'var(--bg-soft)',
+          elevate: 'var(--bg-elevate)'
+        },
+        ink: {
+          DEFAULT: 'var(--ink)',
+          dim: 'var(--ink-dim)',
+          mute: 'var(--ink-mute)'
+        },
+        border: 'var(--border)',
+        accent: {
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
+          soft: 'var(--accent-soft)'
+        },
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        danger: 'var(--danger)',
         border: 'var(--color-border)', // macOS separator
         input: 'var(--color-input)', // white
         ring: 'var(--color-ring)', // macOS blue
