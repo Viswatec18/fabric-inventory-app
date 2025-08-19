@@ -1,14 +1,36 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 
 export const Topbar = () => {
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && e.target.value.trim()) {
+      navigate(`/fabric-catalog-browse?search=${encodeURIComponent(e.target.value)}`);
+    }
+  };
+
+  const handleDocsClick = () => {
+    // Open documentation in new tab
+    window.open('https://docs.fabrichub.com', '_blank');
+  };
+
+  const handleGetStarted = () => {
+    navigate('/login-registration');
+  };
+
   return (
     <div className="h-full flex items-center justify-between px-4">
       {/* Brand */}
-      <div className="flex items-center gap-3">
+      <button 
+        onClick={() => navigate('/')}
+        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        type="button"
+      >
         <div className="w-6 h-6 bg-accent rounded-full"></div>
         <span className="font-semibold text-ink">FabricHub</span>
-      </div>
+      </button>
       
       {/* Search */}
       <div className="flex-1 max-w-md mx-8">
@@ -18,16 +40,25 @@ export const Topbar = () => {
             type="text"
             placeholder="Search fabrics, designers..."
             className="input w-full pl-10"
+            onKeyDown={handleSearch}
           />
         </div>
       </div>
       
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <button className="btn text-ink-dim hover:text-ink">
+        <button 
+          onClick={handleDocsClick}
+          type="button"
+          className="btn text-ink-dim hover:text-ink"
+        >
           Docs
         </button>
-        <button className="btn-accent">
+        <button 
+          onClick={handleGetStarted}
+          type="button"
+          className="btn-accent"
+        >
           Get Started
         </button>
       </div>

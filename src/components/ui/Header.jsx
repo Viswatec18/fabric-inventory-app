@@ -14,11 +14,27 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
       onNavigate?.('/login-registration');
     } catch (error) {
       console.error('Sign out error:', error);
+      // Fallback navigation
+      window.location.href = '/login-registration';
     }
   };
 
   const handleAuthAction = () => {
-    onNavigate?.('/login-registration');
+    try {
+      onNavigate?.('/login-registration');
+    } catch (error) {
+      console.error('Navigation error:', error);
+      window.location.href = '/login-registration';
+    }
+  };
+
+  const handleNavigation = (path) => {
+    try {
+      onNavigate?.(path);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      window.location.href = path;
+    }
   };
 
   const currentUserData = user ? {
@@ -42,19 +58,22 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <button 
-              onClick={() => onNavigate?.('/fabric-catalog-browse')}
+              onClick={() => handleNavigation('/fabric-catalog-browse')}
+              type="button"
               className="text-ink-dim hover:text-accent transition-colors"
             >
               Browse Fabrics
             </button>
             <button 
-              onClick={() => onNavigate?.('/designer-directory-profiles')}
+              onClick={() => handleNavigation('/designer-directory-profiles')}
+              type="button"
               className="text-ink-dim hover:text-accent transition-colors"
             >
               Designers
             </button>
             <button 
-              onClick={() => onNavigate?.('/vendor-dashboard-inventory')}
+              onClick={() => handleNavigation('/vendor-dashboard-inventory')}
+              type="button"
               className="text-ink-dim hover:text-accent transition-colors"
             >
               Vendors
@@ -68,7 +87,8 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onNavigate?.('/shopping-cart-checkout')}
+                  onClick={() => handleNavigation('/shopping-cart-checkout')}
+                  type="button"
                 >
                   <Icon name="ShoppingCart" size={18} />
                 </Button>
@@ -76,6 +96,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
+                    type="button"
                     className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
                   >
                     <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -99,8 +120,9 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                       <button
                         onClick={() => {
                           setShowUserMenu(false);
-                          onNavigate?.('/order-management-dashboard');
+                          handleNavigation('/order-management-dashboard');
                         }}
+                        type="button"
                         className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors"
                       >
                         <Icon name="Package" size={16} className="inline mr-2" />
@@ -111,6 +133,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                           setShowUserMenu(false);
                           // Navigate to profile
                         }}
+                        type="button"
                         className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors"
                       >
                         <Icon name="User" size={16} className="inline mr-2" />
@@ -119,6 +142,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                       <hr className="my-2 border-border" />
                       <button
                         onClick={handleSignOut}
+                        type="button"
                         className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors text-error"
                       >
                         <Icon name="LogOut" size={16} className="inline mr-2" />
@@ -134,6 +158,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                   variant="ghost"
                   size="sm"
                   onClick={handleAuthAction}
+                  type="button"
                 >
                   Sign In
                 </Button>
@@ -141,6 +166,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                   variant="default"
                   size="sm"
                   onClick={handleAuthAction}
+                  type="button"
                 >
                   Get Started
                 </Button>

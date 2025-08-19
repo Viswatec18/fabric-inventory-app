@@ -19,7 +19,6 @@ function App() {
             sidebar={<Sidebar/>}
             topbar={<Topbar/>}
             editor={<div className="h-full flex flex-col"><Tabs/><Routes/></div>}
-            terminal={<div className="font-mono text-xs text-ink-dim p-3">logs…</div>}
           />
         </ErrorBoundary>
       </AuthProvider>

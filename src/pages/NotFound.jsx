@@ -7,7 +7,25 @@ const NotFound = () => {
   const navigate = useNavigate();
 
   const handleGoHome = () => {
-    navigate('/');
+    try {
+      navigate('/');
+    } catch (error) {
+      console.error('Navigation error:', error);
+      window.location.href = '/';
+    }
+  };
+
+  const handleGoBack = () => {
+    try {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      window.location.href = '/';
+    }
   };
 
   return (
@@ -26,19 +44,21 @@ const NotFound = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
-            variant="primary"
-            icon={<Icon name="ArrowLeft" />}
+            variant="default"
+            iconName="ArrowLeft"
             iconPosition="left"
-            onClick={() => window.history?.back()}
+            onClick={handleGoBack}
+            type="button"
           >
             Go Back
           </Button>
 
           <Button
             variant="outline"
-            icon={<Icon name="Home" />}
+            iconName="Home"
             iconPosition="left"
             onClick={handleGoHome}
+            type="button"
           >
             Back to Home
           </Button>

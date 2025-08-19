@@ -8,12 +8,17 @@ export const Tabs = () => {
   ]);
   const [activeTab, setActiveTab] = useState('main');
 
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+  };
+
   return (
     <div className="flex items-center bg-bg-soft border-b border-border">
       {tabs.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => setActiveTab(tab.id)}
+          onClick={() => handleTabClick(tab.id)}
+          type="button"
           className={`px-4 py-2 text-sm font-medium border-r border-border transition-colors ${
             activeTab === tab.id
               ? 'bg-bg text-ink'
