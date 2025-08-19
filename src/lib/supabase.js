@@ -21,24 +21,25 @@ if (!supabaseUrl || !supabaseAnonKey ||
       signOut: () => Promise.resolve({ error: null })
     },
     from: () => ({
-      select: () => ({
-        eq: () => ({
+      select: () => {
+        const mockQueryBuilder = {
+          eq: () => mockQueryBuilder,
+          not: () => mockQueryBuilder,
+          or: () => mockQueryBuilder,
+          overlaps: () => mockQueryBuilder,
+          ilike: () => mockQueryBuilder,
+          gte: () => mockQueryBuilder,
+          lte: () => mockQueryBuilder,
+          in: () => mockQueryBuilder,
+          order: () => mockQueryBuilder,
+          range: () => mockQueryBuilder,
+          limit: () => mockQueryBuilder,
           single: () => Promise.resolve({ data: null, error: { code: 'PGRST116' } }),
-          limit: () => Promise.resolve({ data: [], error: null }),
-          order: () => Promise.resolve({ data: [], error: null }),
-          range: () => Promise.resolve({ data: [], error: null, count: 0 })
-        }),
-        not: () => Promise.resolve({ data: [], error: null }),
-        or: () => Promise.resolve({ data: [], error: null }),
-        overlaps: () => Promise.resolve({ data: [], error: null }),
-        ilike: () => Promise.resolve({ data: [], error: null }),
-        gte: () => Promise.resolve({ data: [], error: null }),
-        lte: () => Promise.resolve({ data: [], error: null }),
-        in: () => Promise.resolve({ data: [], error: null }),
-        order: () => Promise.resolve({ data: [], error: null }),
-        range: () => Promise.resolve({ data: [], error: null, count: 0 }),
-        limit: () => Promise.resolve({ data: [], error: null })
-      }),
+          then: (resolve) => resolve({ data: [], error: null, count: 0 }),
+          catch: () => mockQueryBuilder
+        };
+        return mockQueryBuilder;
+      },
       insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
       update: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
       delete: () => Promise.resolve({ error: { message: 'Supabase not configured' } })
