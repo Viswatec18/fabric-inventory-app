@@ -297,28 +297,18 @@ const DesignerDirectoryProfiles = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header 
-        userRole={userProfile?.role || 'buyer'} 
-        currentUser={user ? { 
-          name: userProfile?.full_name || user?.email?.split('@')?.[0] || 'User',
-          email: user?.email 
-        } : null} 
-        onNavigate={handleNavigation}
-      />
-      <main className="pt-16">
+    <div className="h-full bg-bg text-ink overflow-auto">
+      <main className="h-full">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <Breadcrumb onNavigate={handleNavigation} />
-          
           {/* Error Display */}
           {error && (
-            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-lg">
+            <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-lg">
               <div className="flex items-center space-x-2">
-                <Icon name="AlertTriangle" size={20} className="text-error flex-shrink-0" />
-                <p className="text-error font-medium">{error}</p>
+                <Icon name="AlertTriangle" size={20} className="text-danger flex-shrink-0" />
+                <p className="text-danger font-medium">{error}</p>
                 <button 
                   onClick={() => setError(null)}
-                  className="ml-auto text-error hover:text-error/80"
+                  className="ml-auto text-danger hover:text-danger/80"
                 >
                   <Icon name="X" size={16} />
                 </button>
@@ -331,22 +321,22 @@ const DesignerDirectoryProfiles = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-foreground mb-2">Designer Directory</h1>
-                <p className="text-muted-foreground">
+                <p className="text-ink-dim">
                   Connect with talented fashion designers and textile experts for your custom projects
                 </p>
               </div>
               <div className="hidden lg:flex items-center space-x-4">
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-foreground">{totalCount}</div>
-                  <div className="text-sm text-muted-foreground">Designers Available</div>
+                  <div className="text-2xl font-bold text-ink">{totalCount}</div>
+                  <div className="text-sm text-ink-dim">Designers Available</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-8 h-full overflow-hidden">
             {/* Filters Sidebar */}
-            <div className="lg:w-80 flex-shrink-0">
+            <div className="lg:w-80 flex-shrink-0 overflow-y-auto">
               <DesignerFilters
                 filters={filters}
                 onFiltersChange={handleFiltersChange}
@@ -355,7 +345,7 @@ const DesignerDirectoryProfiles = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1">
+            <div className="flex-1 overflow-auto">
               {/* Sorting Controls */}
               <div className="mb-6">
                 <SortingControls
@@ -372,8 +362,8 @@ const DesignerDirectoryProfiles = () => {
               {isLoading && (
                 <div className="flex items-center justify-center py-12">
                   <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-muted-foreground">Loading designers...</span>
+                    <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-ink-dim">Loading designers...</span>
                   </div>
                 </div>
               )}
@@ -381,9 +371,9 @@ const DesignerDirectoryProfiles = () => {
               {/* No Results */}
               {!isLoading && currentDesigners?.length === 0 && !error && (
                 <div className="text-center py-12">
-                  <Icon name="Search" size={48} className="text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-2">No designers found</h3>
-                  <p className="text-muted-foreground mb-4">
+                  <Icon name="Search" size={48} className="text-ink-mute mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-ink mb-2">No designers found</h3>
+                  <p className="text-ink-dim mb-4">
                     Try adjusting your filters or search terms to find more designers.
                   </p>
                   <Button variant="outline" onClick={handleClearFilters}>

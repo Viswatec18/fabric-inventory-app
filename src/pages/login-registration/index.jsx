@@ -48,7 +48,7 @@ const LoginRegistration = () => {
   }
 
   return (
-    <div className="min-h-screen bg-macos-gray-1 flex flex-col">
+    <div className="h-full bg-bg text-ink flex flex-col overflow-auto">
       {/* Mobile Header */}
       <MobileHeader />
       

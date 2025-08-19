@@ -159,17 +159,11 @@ const FabricCatalogBrowse = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        userRole="user"
-        currentUser={{ name: "User" }}
-        onNavigate={() => {}}
-      />
-      
-      <div className="container mx-auto px-4 py-6">
+    <div className="h-full bg-bg text-ink overflow-auto">
+      <div className="container mx-auto px-4 py-6 min-h-full">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Fabric Catalog</h1>
-          <p className="text-gray-600">Discover premium fabrics from verified vendors</p>
+          <h1 className="text-3xl font-bold text-ink mb-4">Fabric Catalog</h1>
+          <p className="text-ink-dim">Discover premium fabrics from verified vendors</p>
         </div>
 
         <SearchToolbar 
@@ -196,18 +190,18 @@ const FabricCatalogBrowse = () => {
             onClearAll={handleClearAllFilters}
           />
           
-          <div className="flex-1">
+          <div className="flex-1 overflow-auto">
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-lg">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="h-5 w-5 text-danger" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">Error loading fabrics</h3>
-                    <div className="mt-2 text-sm text-red-700">
+                    <h3 className="text-sm font-medium text-danger">Error loading fabrics</h3>
+                    <div className="mt-2 text-sm text-danger">
                       {error}
                     </div>
                     <div className="mt-3">
@@ -216,7 +210,7 @@ const FabricCatalogBrowse = () => {
                           setError(null);
                           loadFabrics();
                         }}
-                        className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded text-sm font-medium transition-colors"
+                        className="btn text-danger hover:bg-danger/10 px-3 py-1 rounded text-sm font-medium transition-colors"
                       >
                         Try Again
                       </button>
@@ -237,20 +231,20 @@ const FabricCatalogBrowse = () => {
             
             {!isLoading && !error && fabrics?.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-24 h-24 mx-auto mb-4 bg-bg-elevate rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-ink-mute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No fabrics found</h3>
-                <p className="text-gray-500 mb-4">Try adjusting your search or filters to find what you're looking for.</p>
+                <h3 className="text-lg font-medium text-ink mb-2">No fabrics found</h3>
+                <p className="text-ink-dim mb-4">Try adjusting your search or filters to find what you're looking for.</p>
                 <button 
                   onClick={() => {
                     setFilters({});
                     setSearchQuery('');
                     setSortBy('newest');
                   }}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="btn-accent px-4 py-2 rounded-lg transition-colors"
                 >
                   Clear All Filters
                 </button>

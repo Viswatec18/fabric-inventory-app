@@ -44,7 +44,7 @@ const SearchToolbar = ({
             className="btn-macos px-4 py-3 lg:hidden"
             title="Toggle filters"
           >
-            <SlidersHorizontal className="w-5 h-5 mr-2" />
+            <SlidersHorizontal className="w-4 h-4 mr-2" />
             Filters
           </button>
         </div>

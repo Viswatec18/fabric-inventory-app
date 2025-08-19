@@ -44,7 +44,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
   } : null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-bg-elevate border-b border-border">
+    <header className="w-full bg-bg-elevate border-b border-border">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -97,33 +97,33 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     type="button"
-                    className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
+                    className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-bg-elevate transition-colors"
                   >
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-medium">
                         {currentUserData?.name?.charAt(0)?.toUpperCase()}
                       </span>
                     </div>
                     <div className="hidden md:block text-left">
-                      <div className="text-sm font-medium text-foreground">
+                      <div className="text-sm font-medium text-ink">
                         {currentUserData?.name}
                       </div>
-                      <div className="text-xs text-muted-foreground capitalize">
+                      <div className="text-xs text-ink-dim capitalize">
                         {currentUserData?.role}
                       </div>
                     </div>
-                    <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
+                    <Icon name="ChevronDown" size={16} className="text-ink-mute" />
                   </button>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-popover border border-border rounded-lg shadow-elevation-2 py-2">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-bg-elevate border border-border rounded-lg shadow-lg py-2">
                       <button
                         onClick={() => {
                           setShowUserMenu(false);
                           handleNavigation('/order-management-dashboard');
                         }}
                         type="button"
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-bg-soft transition-colors text-ink"
                       >
                         <Icon name="Package" size={16} className="inline mr-2" />
                         Orders
@@ -134,7 +134,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                           // Navigate to profile
                         }}
                         type="button"
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-bg-soft transition-colors text-ink"
                       >
                         <Icon name="User" size={16} className="inline mr-2" />
                         Profile
@@ -143,7 +143,7 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
                       <button
                         onClick={handleSignOut}
                         type="button"
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors text-error"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-bg-soft transition-colors text-danger"
                       >
                         <Icon name="LogOut" size={16} className="inline mr-2" />
                         Sign Out

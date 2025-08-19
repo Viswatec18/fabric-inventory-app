@@ -152,15 +152,12 @@ const FabricProductDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header userRole="buyer" />
-      <div className="pt-16">
+    <div className="h-full bg-bg text-ink overflow-auto">
+      <div className="h-full">
         <div className="container mx-auto px-6">
-          {/* Breadcrumb */}
-          <Breadcrumb customItems={breadcrumbItems} />
 
           {/* Main Product Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 py-8">
             {/* Image Gallery - 6 columns */}
             <div className="lg:col-span-6">
               <ImageGallery

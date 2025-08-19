@@ -504,21 +504,14 @@ const OrderManagementDashboard = () => {
   }, [filters, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header 
-        userRole={userRole} 
-        onNavigate={handleNavigation}
-        currentUser={{ name: `${userRole?.charAt(0)?.toUpperCase() + userRole?.slice(1)} User` }}
-      />
-      <main className="pt-16">
+    <div className="h-full bg-bg text-ink overflow-auto">
+      <main className="h-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Breadcrumb onNavigate={handleNavigation} />
-          
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Order Management</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-3xl font-bold text-ink mb-2">Order Management</h1>
+              <p className="text-ink-dim">
                 Track and manage your orders with comprehensive filtering and status updates
               </p>
             </div>

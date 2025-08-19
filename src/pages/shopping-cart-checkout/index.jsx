@@ -262,16 +262,13 @@ const ShoppingCartCheckout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header userRole="buyer" />
-      <main className="pt-16">
+    <div className="h-full bg-bg text-ink overflow-auto">
+      <main className="h-full">
         <div className="container mx-auto px-6 py-8">
-          <Breadcrumb />
-          
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Shopping Cart</h1>
-              <p className="text-muted-foreground mt-2">
+              <h1 className="text-3xl font-bold text-ink">Shopping Cart</h1>
+              <p className="text-ink-dim mt-2">
                 {cartItems?.length} item{cartItems?.length !== 1 ? 's' : ''} in your cart
               </p>
             </div>

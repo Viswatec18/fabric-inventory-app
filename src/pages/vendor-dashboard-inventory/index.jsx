@@ -292,17 +292,14 @@ const VendorDashboardInventory = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header userRole="vendor" currentUser={{ name: vendorData?.contactPerson, email: vendorData?.email }} onNavigate={handleNavigation} />
-      <main className="pt-16">
+    <div className="h-full bg-bg text-ink overflow-auto">
+      <main className="h-full">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <Breadcrumb onNavigate={handleNavigation} />
-          
           {/* Page Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Vendor Dashboard</h1>
-              <p className="text-muted-foreground mt-2">
+              <h1 className="text-3xl font-bold text-ink">Vendor Dashboard</h1>
+              <p className="text-ink-dim mt-2">
                 Manage your inventory, orders, and business analytics
               </p>
             </div>

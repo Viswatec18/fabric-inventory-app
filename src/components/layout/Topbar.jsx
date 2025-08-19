@@ -1,30 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 
 export const Topbar = () => {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
 
+  const handleBrandClick = () => {
+    try {
+      navigate('/fabric-catalog-browse');
+    } catch (error) {
+      console.error('Navigation error:', error);
+      window.location.href = '/fabric-catalog-browse';
+    }
+  };
   const handleSearch = (e) => {
-    if (e.key === 'Enter' && e.target.value.trim()) {
-      navigate(`/fabric-catalog-browse?search=${encodeURIComponent(e.target.value)}`);
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      try {
+        navigate(`/fabric-catalog-browse?search=${encodeURIComponent(searchQuery)}`);
+      } catch (error) {
+        console.error('Search navigation error:', error);
+        window.location.href = `/fabric-catalog-browse?search=${encodeURIComponent(searchQuery)}`;
+      }
     }
   };
 
   const handleDocsClick = () => {
-    // Open documentation in new tab
-    window.open('https://docs.fabrichub.com', '_blank');
+    try {
+      window.open('https://docs.fabrichub.com', '_blank');
+    } catch (error) {
+      console.error('Docs navigation error:', error);
+      // Fallback to internal help page
+      navigate('/support/docs');
+    }
   };
 
   const handleGetStarted = () => {
-    navigate('/login-registration');
+    try {
+      navigate('/login-registration');
+    } catch (error) {
+      console.error('Get started navigation error:', error);
+      window.location.href = '/login-registration';
+    }
   };
 
   return (
     <div className="h-full flex items-center justify-between px-4">
       {/* Brand */}
       <button 
-        onClick={() => navigate('/')}
+        onClick={handleBrandClick}
         className="flex items-center gap-3 hover:opacity-80 transition-opacity"
         type="button"
       >
@@ -39,6 +63,8 @@ export const Topbar = () => {
           <input
             type="text"
             placeholder="Search fabrics, designers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="input w-full pl-10"
             onKeyDown={handleSearch}
           />

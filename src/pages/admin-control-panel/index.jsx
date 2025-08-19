@@ -508,15 +508,12 @@ const AdminControlPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header userRole="admin" />
-      <div className="pt-16">
+    <div className="h-full bg-bg text-ink overflow-auto">
+      <div className="h-full">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <Breadcrumb />
-          
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Admin Control Panel</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold text-ink mb-2">Admin Control Panel</h1>
+            <p className="text-ink-dim">
               Comprehensive platform management and oversight
             </p>
           </div>
