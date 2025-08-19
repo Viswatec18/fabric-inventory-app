@@ -159,25 +159,27 @@ const FabricCatalogBrowse = () => {
   };
 
   return (
-    <div className="h-full bg-bg text-ink overflow-auto">
+    <div className="h-full bg-bg text-ink">
       <div className="container mx-auto px-4 py-6 min-h-full">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-ink mb-4">Fabric Catalog</h1>
           <p className="text-ink-dim">Discover premium fabrics from verified vendors</p>
         </div>
 
-        <SearchToolbar 
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          resultsCount={totalItems}
-          onFilterToggle={() => setIsFilterSidebarOpen(!isFilterSidebarOpen)}
-        />
+        <div className="bg-bg-elevate rounded-lg border border-border mb-6">
+          <SearchToolbar 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            resultsCount={totalItems}
+            onFilterToggle={() => setIsFilterSidebarOpen(!isFilterSidebarOpen)}
+          />
+        </div>
 
-        <div className="flex gap-6">
+        <div className="flex gap-6 h-full overflow-hidden">
           <FilterSidebar 
             isOpen={isFilterSidebarOpen}
             onToggle={() => setIsFilterSidebarOpen(!isFilterSidebarOpen)}
@@ -190,7 +192,7 @@ const FabricCatalogBrowse = () => {
             onClearAll={handleClearAllFilters}
           />
           
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto bg-bg-soft rounded-lg border border-border p-6">
             {error && (
               <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-lg">
                 <div className="flex items-center">

@@ -22,36 +22,36 @@ const SearchToolbar = ({
   ];
 
   return (
-    <div className="bg-white border-b border-macos-gray-2 px-6 py-4">
+    <div className="bg-bg-elevate border-b border-border px-6 py-4">
       <div className="flex items-center justify-between gap-4">
         {/* Left section - Search and Filter */}
         <div className="flex items-center gap-4 flex-1">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-ink-mute" />
             <input
               type="text"
               placeholder="Search fabrics, materials, or suppliers..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e?.target?.value)}
-              className="w-full pl-10 pr-4 py-3 bg-macos-gray-1 border-0 rounded-macos text-foreground placeholder:text-muted-foreground focus-ring-macos focus:bg-white focus:shadow-macos transition-smooth"
+              className="input w-full pl-10 pr-4 py-3"
             />
           </div>
           
           {/* Filter Toggle */}
           <button
             onClick={onFilterToggle}
-            className="btn-macos px-4 py-3 lg:hidden"
+            className="btn px-4 py-3 lg:hidden"
             title="Toggle filters"
           >
-            <SlidersHorizontal className="w-4 h-4 mr-2" />
+            <SlidersHorizontal className="w-3 h-3 mr-2" />
             Filters
           </button>
         </div>
 
         {/* Center section - Results count */}
         <div className="hidden md:block">
-          <span className="text-sm text-muted-foreground font-medium">
+          <span className="text-sm text-ink-dim font-medium">
             {resultsCount?.toLocaleString()} fabrics
           </span>
         </div>
@@ -62,7 +62,7 @@ const SearchToolbar = ({
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e?.target?.value)}
-            className="btn-macos pr-8 appearance-none bg-white focus-ring-macos"
+            className="btn pr-8 appearance-none"
           >
             {sortOptions?.map(option => (
               <option key={option?.value} value={option?.value}>
@@ -72,24 +72,24 @@ const SearchToolbar = ({
           </select>
 
           {/* View Mode */}
-          <div className="flex items-center bg-macos-gray-1 rounded-macos p-1">
+          <div className="flex items-center bg-bg-soft rounded-lg border border-border p-1">
             <button
               onClick={() => onViewModeChange('grid')}
-              className={`p-2 rounded-lg transition-smooth ${
-                viewMode === 'grid' ?'bg-white shadow-macos text-macos-blue' :'text-muted-foreground hover:text-foreground'
+              className={`p-2 rounded-md transition-smooth ${
+                viewMode === 'grid' ? 'bg-accent text-black' : 'text-ink-dim hover:text-ink'
               }`}
               title="Grid view"
             >
-              <Grid3X3 className="w-4 h-4" />
+              <Grid3X3 className="w-3 h-3" />
             </button>
             <button
               onClick={() => onViewModeChange('list')}
-              className={`p-2 rounded-lg transition-smooth ${
-                viewMode === 'list' ?'bg-white shadow-macos text-macos-blue' :'text-muted-foreground hover:text-foreground'
+              className={`p-2 rounded-md transition-smooth ${
+                viewMode === 'list' ? 'bg-accent text-black' : 'text-ink-dim hover:text-ink'
               }`}
               title="List view"
             >
-              <List className="w-4 h-4" />
+              <List className="w-3 h-3" />
             </button>
           </div>
         </div>

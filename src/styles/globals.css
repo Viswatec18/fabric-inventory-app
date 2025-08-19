@@ -16,3 +16,27 @@ body{background:var(--bg); color:var(--ink); font-family:Inter,system-ui,sans-se
 .input:focus{box-shadow:0 0 0 2px var(--accent-soft)}
 *::-webkit-scrollbar{width:10px;height:10px}
 *::-webkit-scrollbar-thumb{background:#1E222D;border-radius:6px;border:2px solid #0E1013}
+
+/* Override any light theme remnants */
+.bg-white { background-color: var(--bg-elevate) !important; }
+.bg-gray-50, .bg-gray-100 { background-color: var(--bg-soft) !important; }
+.text-gray-900, .text-black { color: var(--ink) !important; }
+.text-gray-600, .text-gray-500 { color: var(--ink-dim) !important; }
+.border-gray-200, .border-gray-300 { border-color: var(--border) !important; }
+
+/* Ensure all main content uses dark theme */
+main, .main-content, [role="main"] {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* Fix any remaining light backgrounds */
+.card, .bg-card {
+  background: var(--bg-elevate) !important;
+  border-color: var(--border) !important;
+  color: var(--ink) !important;
+}
+
+/* Ensure proper text contrast */
+.text-foreground { color: var(--ink) !important; }
+.text-muted-foreground { color: var(--ink-dim) !important; }

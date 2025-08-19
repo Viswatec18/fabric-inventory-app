@@ -45,45 +45,45 @@ export const Topbar = () => {
   };
 
   return (
-    <div className="h-full flex items-center justify-between px-4">
+    <div className="h-full flex items-center justify-between px-4 bg-bg-elevate border-b border-border">
       {/* Brand */}
       <button 
         onClick={handleBrandClick}
-        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         type="button"
       >
-        <div className="w-6 h-6 bg-accent rounded-full"></div>
-        <span className="font-semibold text-ink">FabricHub</span>
+        <div className="w-5 h-5 bg-accent rounded-full"></div>
+        <span className="font-semibold text-ink text-sm">FabricHub</span>
       </button>
       
       {/* Search */}
-      <div className="flex-1 max-w-md mx-8">
+      <div className="flex-1 max-w-sm mx-6">
         <div className="relative">
-          <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-mute" />
+          <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-mute" />
           <input
             type="text"
             placeholder="Search fabrics, designers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input w-full pl-10"
+            className="input w-full pl-9 py-2 text-sm"
             onKeyDown={handleSearch}
           />
         </div>
       </div>
       
       {/* Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <button 
           onClick={handleDocsClick}
           type="button"
-          className="btn text-ink-dim hover:text-ink"
+          className="btn text-ink-dim hover:text-ink text-sm px-3 py-2"
         >
           Docs
         </button>
         <button 
           onClick={handleGetStarted}
           type="button"
-          className="btn-accent"
+          className="btn-accent text-sm px-3 py-2"
         >
           Get Started
         </button>

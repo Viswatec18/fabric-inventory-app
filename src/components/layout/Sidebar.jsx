@@ -25,7 +25,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-3 overflow-y-auto">
+    <div className="h-full flex flex-col p-4 overflow-y-auto bg-bg-soft">
       <div className="space-y-1">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -41,7 +41,7 @@ export const Sidebar = () => {
                   : 'text-ink-dim hover:text-ink hover:bg-bg-elevate'
               }`}
             >
-              <Icon name={item.icon} size={16} />
+              <Icon name={item.icon} size={14} />
               <span>{item.label}</span>
             </button>
           );
@@ -49,9 +49,9 @@ export const Sidebar = () => {
       </div>
       
       {/* Support Section */}
-      <div className="mt-auto pt-4 border-t border-border">
+      <div className="mt-auto pt-4 border-t border-border bg-bg-elevate rounded-lg p-3 mx-1">
         <div className="space-y-3">
-          <h3 className="text-xs font-semibold text-ink-dim uppercase tracking-wider">Support</h3>
+          <h3 className="text-xs font-semibold text-ink uppercase tracking-wider">Support</h3>
           
           <div className="space-y-2">
             <button
@@ -59,7 +59,7 @@ export const Sidebar = () => {
               type="button"
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-ink-dim hover:text-ink hover:bg-bg-elevate transition-colors"
             >
-              <Icon name="BookOpen" size={14} />
+              <Icon name="BookOpen" size={12} />
               <span>Documentation</span>
             </button>
             
@@ -68,7 +68,7 @@ export const Sidebar = () => {
               type="button"
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-ink-dim hover:text-ink hover:bg-bg-elevate transition-colors"
             >
-              <Icon name="HelpCircle" size={14} />
+              <Icon name="HelpCircle" size={12} />
               <span>Help Center</span>
             </button>
             
@@ -77,16 +77,21 @@ export const Sidebar = () => {
               type="button"
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-ink-dim hover:text-ink hover:bg-bg-elevate transition-colors"
             >
-              <Icon name="Mail" size={14} />
+              <Icon name="Mail" size={12} />
               <span>Contact</span>
             </button>
           </div>
           
           <div className="pt-2 border-t border-border">
-            <div className="text-xs text-ink-mute space-y-1">
+            <div className="text-xs text-ink-mute space-y-1 leading-relaxed">
               <div>support@fabrichub.com</div>
               <div>+1 (555) 123-4567</div>
-              <div className="text-xs">Mon-Fri 9AM-6PM EST</div>
+              <div>Mon-Fri 9AM-6PM EST</div>
+              <div className="pt-2">
+                <button className="text-accent hover:text-accent-hover text-xs font-medium">
+                  Open Support Ticket
+                </button>
+              </div>
             </div>
           </div>
         </div>

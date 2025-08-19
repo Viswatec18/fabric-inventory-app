@@ -88,35 +88,35 @@ const FilterSidebar = ({
       {/* Sidebar */}
       <div className={`
         fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
-        w-80 lg:w-72 bg-white lg:bg-macos-gray-1
-        border-r border-macos-gray-2
+        w-80 lg:w-72 bg-bg-elevate
+        border-r border-border
         transform transition-transform duration-300 ease-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        overflow-y-auto scrollbar-macos
+        overflow-y-auto
       `}>
         {/* Header */}
-        <div className="sticky top-0 bg-white lg:bg-macos-gray-1 border-b border-macos-gray-2 p-6 z-10">
+        <div className="sticky top-0 bg-bg-elevate border-b border-border p-6 z-10">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-semibold text-xl text-foreground">Filters</h2>
+            <h2 className="font-semibold text-lg text-ink">Filters</h2>
             <div className="flex items-center gap-2">
               <button
                 onClick={onClearAll}
-                className="text-sm text-macos-blue hover:text-macos-blue/80 font-medium transition-smooth"
+                className="text-sm text-accent hover:text-accent-hover font-medium transition-smooth"
               >
                 Clear All
               </button>
               <button
                 onClick={onToggle}
-                className="lg:hidden btn-macos p-2"
+                className="lg:hidden btn p-2"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="p-6 space-y-0">
+        <div className="p-6 space-y-4">
           {/* Materials */}
           <FilterSection
             title="Materials"
@@ -130,9 +130,9 @@ const FilterSidebar = ({
                     type="checkbox"
                     checked={filters?.materials?.includes(material)}
                     onChange={() => handleMaterialChange(material)}
-                    className="w-4 h-4 text-macos-blue border-macos-gray-3 rounded focus:ring-macos-blue focus:ring-2 focus:ring-offset-0"
+                    className="w-4 h-4 text-accent border-border rounded focus:ring-accent focus:ring-2 focus:ring-offset-0 bg-bg-soft"
                   />
-                  <span className="ml-3 text-sm text-foreground group-hover:text-macos-blue transition-smooth">
+                  <span className="ml-3 text-sm text-ink group-hover:text-accent transition-smooth">
                     {material}
                   </span>
                 </label>
@@ -149,23 +149,23 @@ const FilterSidebar = ({
             <div className="space-y-4">
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs text-muted-foreground mb-2 font-medium">MIN</label>
+                  <label className="block text-xs text-ink-dim mb-2 font-medium">MIN</label>
                   <input
                     type="number"
                     placeholder="$0"
                     value={filters?.priceRange?.min}
                     onChange={(e) => handlePriceChange('min', e?.target?.value)}
-                    className="w-full px-3 py-2 bg-white border border-macos-gray-2 rounded-lg text-sm focus-ring-macos"
+                    className="input w-full text-sm"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xs text-muted-foreground mb-2 font-medium">MAX</label>
+                  <label className="block text-xs text-ink-dim mb-2 font-medium">MAX</label>
                   <input
                     type="number"
                     placeholder="$999"
                     value={filters?.priceRange?.max}
                     onChange={(e) => handlePriceChange('max', e?.target?.value)}
-                    className="w-full px-3 py-2 bg-white border border-macos-gray-2 rounded-lg text-sm focus-ring-macos"
+                    className="input w-full text-sm"
                   />
                 </div>
               </div>
