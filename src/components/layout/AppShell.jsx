@@ -5,6 +5,7 @@ const AppShell = ({ sidebar, topbar, editor, terminal }) => {
   const [isResizingSidebar, setIsResizingSidebar] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(200);
   const [isResizingTerminal, setIsResizingTerminal] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   const sidebarRef = useRef(null);
   const terminalRef = useRef(null);
@@ -50,16 +51,35 @@ const AppShell = ({ sidebar, topbar, editor, terminal }) => {
         {/* Sidebar */}
         <div 
           ref={sidebarRef}
-          className="bg-bg-soft border-r border-border flex-shrink-0 relative"
-          style={{ width: `${sidebarWidth}px` }}
+          className={`bg-bg-soft border-r border-border flex-shrink-0 relative transition-all duration-300 ${
+            isSidebarCollapsed ? 'w-12' : ''
+          }`}
+          style={{ width: isSidebarCollapsed ? '48px' : `${sidebarWidth}px` }}
         >
+          {/* Sidebar Toggle */}
+          <button
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            className="absolute top-4 -right-3 w-6 h-6 bg-bg-elevate border border-border rounded-full flex items-center justify-center hover:bg-bg-soft transition-colors z-10"
+          >
+            <svg 
+              className={`w-3 h-3 text-ink-dim transition-transform ${isSidebarCollapsed ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
           {sidebar}
           
           {/* Sidebar resize handle */}
-          <div
-            className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-accent-soft transition-colors"
-            onMouseDown={() => setIsResizingSidebar(true)}
-          />
+          {!isSidebarCollapsed && (
+            <div
+              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-accent-soft transition-colors"
+              onMouseDown={() => setIsResizingSidebar(true)}
+            />
+          )}
         </div>
         
         {/* Main content area with editor/terminal split */}

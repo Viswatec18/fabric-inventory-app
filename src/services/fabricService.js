@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { mockFabrics, mockMaterials } from '../data/seed.js';
 
 // Retry utility function
 const retryOperation = async (operation, maxRetries = 3, delay = 1000) => {
@@ -96,9 +97,6 @@ export const getFabrics = async (filters = {}) => {
     } catch (error) {
       console.warn('Using mock data due to database connection issue:', error?.message);
       
-      // Import mock data from dedicated seed file
-      const { mockFabrics } = await import('../data/seed.js');
-
       // Apply client-side filtering to mock data
       let filteredMockData = [...mockFabrics];
 
@@ -429,14 +427,10 @@ export const getFabricMaterials = async () => {
         }
         
         if (error?.code === 'PGRST116' || error?.message?.includes('does not exist')) {
-          // Import mock materials from seed file
-          const { mockMaterials } = await import('../data/seed.js');
           return mockMaterials;
         }
         
         console.error('Error fetching materials:', error);
-        // Import mock materials from seed file
-        const { mockMaterials } = await import('../data/seed.js');
         return mockMaterials;
       }
 
@@ -447,14 +441,7 @@ export const getFabricMaterials = async () => {
     return await retryOperation(operation);
   } catch (error) {
     console.error('Error fetching fabric materials:', error);
-    // Import mock materials from seed file as fallback
-    try {
-      const { mockMaterials } = await import('../data/seed.js');
-      return mockMaterials;
-    } catch (importError) {
-      console.error('Failed to import mock materials:', importError);
-      return [];
-    }
+    return mockMaterials;
   }
 };
 
@@ -476,6 +463,7 @@ export const addFabricReview = async (fabricId, reviewData) => {
     throw error;
   }
 };
+
 function getVendors(...args) {
   // eslint-disable-next-line no-console
   console.warn('Placeholder: getVendors is not implemented yet.', args);
