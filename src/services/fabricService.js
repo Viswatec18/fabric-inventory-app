@@ -107,6 +107,75 @@ export const getFabrics = async (filters = {}) => {
           minimum_order_quantity: 50,
           gsm: 180,
           rating: 4.8,
+          review_count: 124,
+          status: 'active',
+          stock_quantity: 500,
+          is_featured: true,
+          fabric_images: [
+          *,
+          vendor:vendors(
+            id,
+            name,
+            verified,
+            rating
+          ),
+          fabric_images(
+            id,
+            image_url,
+            display_order
+          )
+        `);
+
+        // Apply filters (existing filter logic)
+        if (filters?.materials && filters?.materials?.length > 0) {
+          query = query?.in('material', filters?.materials);
+        }
+
+        if (filters?.search) {
+          query = query?.or(`name.ilike.%${filters?.search}%,material.ilike.%${filters?.search}%,composition.ilike.%${filters?.search}%`);
+        }
+
+        // Sorting
+        if (filters?.sortBy) {
+          switch (filters?.sortBy) {
+            case 'price-low':
+              query = query?.order('price_per_yard', { ascending: true });
+              break;
+            case 'price-high':
+              query = query?.order('price_per_yard', { ascending: false });
+              break;
+            case 'newest':
+              query = query?.order('created_at', { ascending: false });
+              break;
+            default:
+              query = query?.order('created_at', { ascending: false });
+          }
+        }
+
+        const { data, error, count } = await query;
+        
+        if (error) {
+          throw error;
+        }
+
+        return { data: data || [], count: count || 0 };
+      };
+
+      return await retryOperation(operation);
+    } catch (error) {
+      console.warn('Using mock data due to database connection issue:', error?.message);
+      
+      // Return mock data for development
+      const mockFabrics = [
+        {
+          id: 'mock-1',
+          name: 'Premium Cotton Blend',
+          description: 'High-quality cotton blend fabric perfect for fashion garments',
+          material: 'Cotton',
+          price_per_yard: 12.50,
+          minimum_order_quantity: 50,
+          gsm: 180,
+          rating: 4.8,
           review_count\: 124,
           status: 'active',
           stock_quantity: 500,
@@ -173,70 +242,8 @@ export const getFabrics = async (filters = {}) => {
           description: 'Durable denim fabric for workwear and casual clothing',
           material: 'Denim',
           price_per_yard: 22.00,
-          minimum_order_quantity: 40,
-          gsm: 340,
-          rating: 4.6,
-          review_count: 203,
-          status: 'active',
-          stock_quantity: 180,
-          is_featured: false,
-          fabric_images: [
-            { image_url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop' }
-          ],
-          vendor: {
-            id: 'vendor-4',
-            name: 'Denim Works Ltd.',
-            verified: true,
-            rating: 4.6
-          }
-        },
-        {
-          id: 'mock-5',
-          name: 'Wool Blend Suiting',
-          description: 'Professional suiting fabric with excellent drape',
-          material: 'Wool',
-          price_per_yard: 35.50,
-          minimum_order_quantity: 20,
-          gsm: 280,
-          rating: 4.8,
-          review_count: 67,
-          status: 'active',
-          stock_quantity: 120,
-          is_featured: true,
-          fabric_images: [
-            { image_url: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400&h=400&fit=crop' }
-          ],
-          vendor: {
-            id: 'vendor-5',
-            name: 'Suiting Specialists',
-            verified: true,
-            rating: 4.8
-          }
-        },
-        {
-          id: 'mock-6',
-          name: 'Bamboo Fiber Blend',
-          description: 'Sustainable bamboo fiber with natural antibacterial properties',
-          material: 'Bamboo',
-          price_per_yard: 16.25,
-          minimum_order_quantity: 35,
-          gsm: 150,
-          rating: 4.5,
-          review_count: 92,
-          status: 'active',
-          stock_quantity: 280,
-          is_featured: false,
-          fabric_images: [
-            { image_url: 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400&h=400&fit=crop' }
-          ],
-          vendor: {
-            id: 'vendor-6',
-            name: 'Green Fiber Co.',
-            verified: true,
-            rating: 4.5
-          }
-        }
-      ];
+      // Import mock data from dedicated seed file
+      const { mockFabrics } = await import('../data/seed.js');
 
       // Apply client-side filtering to mock data
       let filteredMockData = [...mockFabrics];
@@ -568,11 +575,15 @@ export const getFabricMaterials = async () => {
         }
         
         if (error?.code === 'PGRST116' || error?.message?.includes('does not exist')) {
-          return []; // Return empty array for materials if table doesn't exist
+          // Import mock materials from seed file
+          const { mockMaterials } = await import('../data/seed.js');
+          return mockMaterials;
         }
         
         console.error('Error fetching materials:', error);
-        return []; // Return empty array for materials if there's an error
+        // Import mock materials from seed file
+        const { mockMaterials } = await import('../data/seed.js');
+        return mockMaterials;
       }
 
       const materials = [...new Set(data?.map(item => item?.material))]?.filter(Boolean);
@@ -582,7 +593,14 @@ export const getFabricMaterials = async () => {
     return await retryOperation(operation);
   } catch (error) {
     console.error('Error fetching fabric materials:', error);
-    return []; // Always return empty array on error for materials
+    // Import mock materials from seed file as fallback
+    try {
+      const { mockMaterials } = await import('../data/seed.js');
+      return mockMaterials;
+    } catch (importError) {
+      console.error('Failed to import mock materials:', importError);
+      return [];
+    }
   }
 };
 
