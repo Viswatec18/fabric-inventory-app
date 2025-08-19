@@ -1,210 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { getFabrics, getFabricMaterials } from '../../services/fabricService';
-import { mockFabrics } from '../../data/seed.js';
-import SearchToolbar from './components/SearchToolbar';
-import FilterSidebar from './components/FilterSidebar';
-import FabricGrid from './components/FabricGrid';
-import Pagination from './components/Pagination';
-import QuickPreviewModal from './components/QuickPreviewModal';
+import React, { useState } from 'react';
+import { 
+  Home, 
+  Package, 
+  ShoppingCart, 
+  Users, 
+  Settings, 
+  ChevronLeft,
+  ChevronRight,
+  Palette,
+  TrendingUp,
+  FileText
+} from 'lucide-react';
 
-const FabricCatalogBrowse = () => {
-  const [fabrics, setFabrics] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    materials: [],
-    priceRange: { min: '', max: '' },
-    gsmRange: { min: '', max: '' },
-    moqRange: { min: '', max: '' },
-    search: '',
-    sortBy: 'newest'
-  });
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    itemsPerPage: 24,
-    totalItems: 0
-  });
-  const [availableMaterials, setAvailableMaterials] = useState([]);
-  const [viewMode, setViewMode] = useState('grid');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedFabric, setSelectedFabric] = useState(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+const Sidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  useEffect(() => {
-    loadFabrics();
-    loadMaterials();
-  }, [filters, pagination.currentPage]);
+  const menuItems = [
+    { icon: Home, label: 'Dashboard', path: '/', active: false },
+    { icon: Package, label: 'Fabric Catalog', path: '/fabric-catalog-browse', active: true },
+    { icon: ShoppingCart, label: 'Shopping Cart', path: '/shopping-cart-checkout', active: false },
+    { icon: FileText, label: 'Orders', path: '/order-management-dashboard', active: false },
+    { icon: Users, label: 'Designers', path: '/designer-directory-profiles', active: false },
+    { icon: TrendingUp, label: 'Vendor Dashboard', path: '/vendor-dashboard-inventory', active: false },
+    { icon: Settings, label: 'Admin Panel', path: '/admin-control-panel', active: false },
+  ];
 
-  const loadFabrics = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const filterParams = {
-        ...filters,
-        page: pagination.currentPage,
-        itemsPerPage: pagination.itemsPerPage
-      };
-      
-      try {
-        const result = await getFabrics(filterParams);
-        setFabrics(result.data || []);
-        setPagination(prev => ({
-          ...prev,
-          totalItems: result.count || 0
-        }));
-      } catch (err) {
-        console.warn('Using mock data:', err.message);
-        // Use mock data as fallback
-        let filteredData = [...mockFabrics];
-        
-        // Apply client-side filtering
-        if (filters.materials?.length > 0) {
-          filteredData = filteredData.filter(fabric => 
-            filters.materials.includes(fabric.material)
-          );
-        }
-        
-        if (filters.search) {
-          const searchLower = filters.search.toLowerCase();
-          filteredData = filteredData.filter(fabric =>
-            fabric.name.toLowerCase().includes(searchLower) ||
-            fabric.material.toLowerCase().includes(searchLower) ||
-            fabric.description.toLowerCase().includes(searchLower)
-          );
-        }
-        
-        setFabrics(filteredData);
-        setPagination(prev => ({
-          ...prev,
-          totalItems: filteredData.length
-        }));
-      }
-    } catch (err) {
-      console.error('Error loading fabrics:', err);
-      setError(err.message || 'Failed to load fabrics');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadMaterials = async () => {
-    try {
-      const materials = await getFabricMaterials();
-      setAvailableMaterials(materials || []);
-    } catch (err) {
-      console.error('Error loading materials:', err);
-    }
-  };
-
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-  };
-
-  const handlePageChange = (page) => {
-    setPagination(prev => ({ ...prev, currentPage: page }));
-  };
-
-  const handleQuickPreview = (fabric) => {
-    setSelectedFabric(fabric);
-    setIsPreviewOpen(true);
-  };
-
-  const handleClosePreview = () => {
-    setIsPreviewOpen(false);
-    setSelectedFabric(null);
-  };
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-ink mb-4">Error Loading Fabrics</h2>
-          <p className="text-ink-dim mb-4">{error}</p>
+  return (
+    <div className={`bg-surface border-r border-border transition-all duration-300 ${
+      isCollapsed ? 'w-16' : 'w-64'
+    }`}>
+      {/* Header */}
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center justify-between">
+          {!isCollapsed && (
+            <div className="flex items-center gap-2">
+              <Palette className="w-6 h-6 text-primary" />
+              <span className="font-semibold text-foreground">FabricHub</span>
+            </div>
+          )}
           <button
-            onClick={loadFabrics}
-            className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md transition-colors"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
           >
-            Try Again
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+            )}
           </button>
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="min-h-screen bg-bg">
-      <div className="h-full flex flex-col">
-        <SearchToolbar 
-          searchQuery={filters.search}
-          onSearchChange={(query) => setFilters(prev => ({ ...prev, search: query }))}
-          sortBy={filters.sortBy}
-          onSortChange={(sort) => setFilters(prev => ({ ...prev, sortBy: sort }))}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          resultsCount={pagination.totalItems}
-          onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
-          filters={filters}
-          onFiltersChange={handleFilterChange}
-        />
-        
-        <div className="flex flex-1 overflow-hidden">
-          <FilterSidebar
-            filters={filters}
-            onFiltersChange={handleFilterChange}
-            isOpen={isFilterOpen}
-            onToggle={() => setIsFilterOpen(!isFilterOpen)}
-            onClearAll={() => setFilters({
-              materials: [],
-              priceRange: { min: '', max: '' },
-              gsmRange: { min: '', max: '' },
-              moqRange: { min: '', max: '' },
-              search: '',
-              sortBy: 'newest'
-            })}
-            availableMaterials={availableMaterials}
-          />
-          
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-auto p-6">
-              <FabricGrid 
-                fabrics={fabrics}
-                viewMode={viewMode}
-                isLoading={loading}
-                onQuickPreview={handleQuickPreview}
-              />
-            </div>
-            
-            {!loading && fabrics.length > 0 && (
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={Math.ceil(pagination.totalItems / pagination.itemsPerPage)}
-                totalItems={pagination.totalItems}
-                itemsPerPage={pagination.itemsPerPage}
-                onPageChange={handlePageChange}
-                onItemsPerPageChange={(itemsPerPage) => 
-                  setPagination(prev => ({ ...prev, itemsPerPage, currentPage: 1 }))
-                }
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Preview Modal */}
-      <QuickPreviewModal
-        fabric={selectedFabric}
-        isOpen={isPreviewOpen}
-        onClose={handleClosePreview}
-      />
+      {/* Navigation */}
+      <nav className="p-2">
+        <ul className="space-y-1">
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <a
+                href={item.path}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                  item.active
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                {!isCollapsed && (
+                  <span className="font-medium">{item.label}</span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 };
 
-export default FabricCatalogBrowse;
+export default Sidebar;
