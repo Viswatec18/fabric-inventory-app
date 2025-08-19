@@ -1,0 +1,18 @@
+:root{
+  --bg:#0E1013; --bg-soft:#0B0D10; --bg-elevate:#111318;
+  --ink:#E5EAF5; --ink-dim:#A6B0C3; --ink-mute:#6E7890;
+  --border:#232837;
+  --accent:#FFB33F; --accent-hover:#FF8A00; --accent-soft:#FFD48A33;
+  --success:#2AD4A6; --warning:#F5C44E; --danger:#FF5C5C;
+}
+html{color-scheme:dark}
+body{background:var(--bg); color:var(--ink); font-family:Inter,system-ui,sans-serif; font-size:14px}
+.card{background:color-mix(in srgb,var(--bg-elevate) 80%,transparent); border:1px solid var(--border); border-radius:12px}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-elevate)}
+.btn:hover{background:var(--bg-soft)}
+.btn-accent{background:var(--accent);color:#000;border-color:transparent}
+.btn-accent:hover{background:var(--accent-hover)}
+.input{background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;padding:.5rem .75rem;outline:none}
+.input:focus{box-shadow:0 0 0 2px var(--accent-soft)}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-thumb{background:#1E222D;border-radius:6px;border:2px solid #0E1013}

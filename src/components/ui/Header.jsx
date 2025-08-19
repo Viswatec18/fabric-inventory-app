@@ -28,34 +28,34 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
   } : null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass-macos border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-bg-elevate border-b border-border">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
               <Icon name="Palette" size={18} className="text-white" />
             </div>
-            <h1 className="text-xl font-bold text-foreground">FabricHub</h1>
+            <h1 className="text-xl font-bold text-ink">FabricHub</h1>
           </div>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <button 
               onClick={() => onNavigate?.('/fabric-catalog-browse')}
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-ink-dim hover:text-accent transition-colors"
             >
               Browse Fabrics
             </button>
             <button 
               onClick={() => onNavigate?.('/designer-directory-profiles')}
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-ink-dim hover:text-accent transition-colors"
             >
               Designers
             </button>
             <button 
               onClick={() => onNavigate?.('/vendor-dashboard-inventory')}
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-ink-dim hover:text-accent transition-colors"
             >
               Vendors
             </button>
