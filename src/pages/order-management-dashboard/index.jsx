@@ -516,8 +516,18 @@ const OrderManagementDashboard = () => {
               </p>
             </div>
             
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/')}
+                iconName="Home"
+                iconPosition="left"
+              >
+                Dashboard
+              </Button>
+              
             {/* Role Switcher for Demo */}
-            <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+              <div className="flex items-center space-x-2">
               <span className="text-sm text-muted-foreground">View as:</span>
               {['buyer', 'vendor', 'admin']?.map((role) => (
                 <Button
@@ -529,8 +539,8 @@ const OrderManagementDashboard = () => {
                   {role?.charAt(0)?.toUpperCase() + role?.slice(1)}
                 </Button>
               ))}
+              </div>
             </div>
-          </div>
 
           {/* Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
