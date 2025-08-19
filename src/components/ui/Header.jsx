@@ -45,7 +45,6 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
   } : null;
 
   const navigationItems = [
-    { path: '/', label: 'Dashboard', icon: 'Home' },
     { path: '/fabric-catalog-browse', label: 'Browse Fabrics', icon: 'Search' },
     { path: '/designer-directory-profiles', label: 'Designers', icon: 'Users' },
     { path: '/vendor-dashboard-inventory', label: 'Vendors', icon: 'Store' },
@@ -76,6 +75,14 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
 
         {/* Navigation */}
         <nav className="nav-menu">
+          <button
+            onClick={() => handleNavigation('/')}
+            type="button"
+            className={`nav-link ${isActivePath('/') ? 'active' : ''}`}
+          >
+            <Icon name="Home" size={16} className="mr-2" />
+            Dashboard
+          </button>
           {navigationItems.map((item) => (
             <button
               key={item.path}
