@@ -58,6 +58,13 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <button 
+              onClick={() => handleNavigation('/')}
+              type="button"
+              className="text-ink-dim hover:text-accent transition-colors"
+            >
+              Dashboard
+            </button>
+            <button 
               onClick={() => handleNavigation('/fabric-catalog-browse')}
               type="button"
               className="text-ink-dim hover:text-accent transition-colors"
@@ -117,6 +124,17 @@ const Header = ({ userRole, currentUser, onNavigate }) => {
 
                   {showUserMenu && (
                     <div className="absolute right-0 top-full mt-2 w-48 bg-bg-elevate border border-border rounded-lg shadow-lg py-2">
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          handleNavigation('/');
+                        }}
+                        type="button"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-bg-soft transition-colors text-ink"
+                      >
+                        <Icon name="Home" size={16} className="inline mr-2" />
+                        Dashboard
+                      </button>
                       <button
                         onClick={() => {
                           setShowUserMenu(false);

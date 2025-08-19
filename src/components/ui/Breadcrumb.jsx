@@ -17,7 +17,7 @@ const Breadcrumb = ({ customItems = null, onNavigate = null }) => {
 
   const getRouteMapping = () => {
     return {
-      '/': { label: 'Home', icon: 'Home' },
+      '/': { label: 'Dashboard', icon: 'Home' },
       '/fabric-catalog-browse': { label: 'Catalog', icon: 'Search' },
       '/fabric-product-detail': { label: 'Product Details', icon: 'Package' },
       '/shopping-cart-checkout': { label: 'Cart & Checkout', icon: 'ShoppingCart' },
@@ -42,8 +42,8 @@ const Breadcrumb = ({ customItems = null, onNavigate = null }) => {
     // Always start with home
     const items = [
       {
-        label: 'Home',
-        path: '/fabric-catalog-browse',
+        label: 'Dashboard',
+        path: '/',
         icon: 'Home',
         isActive: false
       }
