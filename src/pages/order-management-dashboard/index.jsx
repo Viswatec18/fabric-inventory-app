@@ -517,15 +517,15 @@ const OrderManagementDashboard = () => {
             </div>
             
             <div className="flex items-center space-x-3">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/')}
-                iconName="Home"
-                iconPosition="left"
-              >
-                Dashboard
-              </Button>
-              
+             <Button
+               variant="outline"
+               onClick={() => handleNavigation('/')}
+               iconName="Home"
+               iconPosition="left"
+             >
+               Dashboard
+             </Button>
+             
             {/* Role Switcher for Demo */}
               <div className="flex items-center space-x-2">
               <span className="text-sm text-muted-foreground">View as:</span>
@@ -541,6 +541,7 @@ const OrderManagementDashboard = () => {
               ))}
               </div>
             </div>
+          </div>
 
           {/* Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -589,7 +590,7 @@ const OrderManagementDashboard = () => {
               <h3 className="text-lg font-semibold text-foreground mb-2">No orders found</h3>
               <p className="text-muted-foreground mb-6">
                 {searchQuery || Object.values(filters)?.some(f => f !== 'all' && f !== '')
-                  ? 'Try adjusting your search or filters' :'No orders have been placed yet'
+                  ? 'Try adjusting your search or filters' : 'No orders have been placed yet'
                 }
               </p>
               {!searchQuery && !Object.values(filters)?.some(f => f !== 'all' && f !== '') && (
