@@ -111,7 +111,11 @@ export const getFabrics = async (filters = {}) => {
           status: 'active',
           stock_quantity: 500,
           is_featured: true,
-          fabric_images: [
+          fabric_images: []
+        }
+      ];
+
+      return { data: mockFabrics, count: mockFabrics.length };
     }
 
     const operation = async () => {
