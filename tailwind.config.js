@@ -12,44 +12,7 @@ export default {
         mono: ['IBM Plex Mono', 'ui-monospace', 'SFMono-Regular']
       },
       colors: {
-        bg: {
-          DEFAULT: 'var(--bg)',
-          soft: 'var(--bg-soft)',
-          elevate: 'var(--bg-elevate)'
-        },
-        ink: {
-          DEFAULT: 'var(--ink)',
-          dim: 'var(--ink-dim)',
-          mute: 'var(--ink-mute)'
-        },
-        border: 'var(--border)',
-        accent: {
-          DEFAULT: 'var(--accent)',
-          hover: 'var(--accent-hover)',
-          soft: 'var(--accent-soft)'
-        },
-        success: 'var(--success)',
-        warning: 'var(--warning)',
-        danger: 'var(--danger)',
-        bg: {
-          DEFAULT: 'var(--bg)',
-          soft: 'var(--bg-soft)',
-          elevate: 'var(--bg-elevate)'
-        },
-        ink: {
-          DEFAULT: 'var(--ink)',
-          dim: 'var(--ink-dim)',
-          mute: 'var(--ink-mute)'
-        },
-        border: 'var(--border)',
-        accent: {
-          DEFAULT: 'var(--accent)',
-          hover: 'var(--accent-hover)',
-          soft: 'var(--accent-soft)'
-        },
-        success: 'var(--success)',
-        warning: 'var(--warning)',
-        danger: 'var(--danger)',
+        // Replit.ai inspired color system
         border: 'var(--color-border)', // macOS separator
         input: 'var(--color-input)', // white
         ring: 'var(--color-ring)', // macOS blue
@@ -99,6 +62,17 @@ export default {
         'text-primary': 'var(--color-text-primary)', // macOS primary text
         'text-secondary': 'var(--color-text-secondary)', // macOS secondary text
         // macOS specific colors
+        // Legacy color mappings for existing components
+        bg: {
+          DEFAULT: 'var(--color-background)',
+          soft: 'var(--color-muted)',
+          elevate: 'var(--color-card)'
+        },
+        ink: {
+          DEFAULT: 'var(--color-foreground)',
+          dim: 'var(--color-muted-foreground)',
+          mute: 'var(--color-muted-foreground)'
+        },
         'macos': {
           'gray-1': 'var(--color-macos-gray-1)', // #F5F5F7
           'gray-2': 'var(--color-macos-gray-2)', // #E5E5E7
@@ -111,11 +85,18 @@ export default {
           'red': '#FF3B30',
           'yellow': '#FFCC00',
         },
+        // Replit brand colors
+        'replit': {
+          'blue': 'var(--color-replit-blue)',
+          'orange': 'var(--color-replit-orange)',
+          'green': 'var(--color-replit-green)',
+          'purple': 'var(--color-replit-purple)',
+        },
       },
       fontFamily: {
-        sans: ['SF Pro Text', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['SF Pro Display', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['SF Mono', 'JetBrains Mono', 'Monaco', 'monospace'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        display: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'Cascadia Code', 'monospace'],
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.025em' }],
